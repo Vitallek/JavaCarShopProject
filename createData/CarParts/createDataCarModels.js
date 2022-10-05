@@ -105,6 +105,7 @@ const result = [{
   brands: carsModels,
   sedan: sedan,
   wagon: wagon,
+  suv: suv,
   sport: sport,
   compact: compact
 }]
@@ -118,16 +119,19 @@ createDB = async () => {
   const brandsColl = db.collection('Brands')
   const sedanColl = db.collection('Sedan')
   const wagonColl = db.collection('Wagon')
+  const suvColl = db.collection('SUV')
   const sportColl = db.collection('Sport')
   const compactColl = db.collection('Compact')
   brandsColl.drop()
   sedanColl.drop()
   wagonColl.drop()
+  suvColl.drop()
   sportColl.drop()
   compactColl.drop()
   await brandsColl.insertMany(carsModels)
   await sedanColl.insertMany(sedan)
   await wagonColl.insertMany(wagon)
+  await suvColl.insertMany(suv)
   await sportColl.insertMany(sport)
   await compactColl.insertMany(compact)
   client.close()

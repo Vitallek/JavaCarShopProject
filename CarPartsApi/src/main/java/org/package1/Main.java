@@ -62,17 +62,23 @@ public class Main {
         });
         get("/get-all/:type",(req,res) -> {
             switch (req.params(":type")) {
-                case "bodyKit":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.BODYKIT_COL);
+                case "brands":{
+                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.BRANDS_COL);
                 }
-                case "wheels":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.WHEELS_COL);
+                case "sedan":{
+                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.SEDAN_COL);
                 }
-                case "calipers":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.CALIPERS_COL);
+                case "wagon":{
+                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.WAGON_COL);
                 }
-                case "consumables":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.CONSUMABLE_COL);
+                case "suv":{
+                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.SUV_COL);
+                }
+                case "sport":{
+                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.SPORT_COL);
+                }
+                case "compact":{
+                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.COMPACT_COL);
                 }
                 default: return "";
             }

@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import Cookies from 'js-cookie';
 
-import NavComponent from '../NavSidebar/NavComponent';
+import NavComponent from '../NavBars/NavComponent';
 import { Grid, Button, Link, Stack } from '@mui/material';
 import '@fontsource/roboto/400.css';
 import { Box } from '@mui/system';

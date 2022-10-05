@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Cookies from "js-cookie";
 //routes
-import HomePageAuthorized from "./HomePage/HomePageAuthorized";
+import HomePageAuthorized from "./HomePage/HomePage";
 // import CreateReserveFromPricelist from "./CreateReserveFromPricelist/CreateReserveFromPricelist";
 // import TradeicsbelMain from "./Tradeicsbel/TradeicsbelMain";
 // import { GetCart } from "./Utility/CallCart";
@@ -30,7 +30,7 @@ const ProtectedRoutes = () => {
 
   return (
     <>
-        <Route path="/" element={<HomePageAuthorized />} />
+        <Route path="/adm" element={<HomePage />} />
 
         {/* <Route path="/cart" element={<UnderConstructionTemplate/>}/>
 

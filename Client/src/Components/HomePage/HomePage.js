@@ -1,7 +1,7 @@
 import React from 'react';
 import Cookies from 'js-cookie';
 
-import NavComponent from '../NavSidebar/NavComponent';
+import NavComponent from '../NavBars/NavComponent';
 import { Grid, Button, Link, Stack } from '@mui/material';
 import '../../App.css'
 import '@fontsource/roboto/400.css';
@@ -12,7 +12,7 @@ const Logout = () => {
   window.location.reload()
 }
 
-const HomePageAuthorized = () => {
+const HomePage = () => {
   
   return (
     <Grid container>
@@ -20,14 +20,8 @@ const HomePageAuthorized = () => {
         {/* <NavSidebar/> */}
         <NavComponent/>
       </Grid>
-      <Grid item xs={2}>
-       <Stack direction="column" spacing={2}>
-          <Link href="https://trello.com/b/tlErhkn6/webapp">Trello</Link>
-          <Button variant="filled" onClick={Logout}>Logout</Button>
-        </Stack>
-      </Grid>
     </Grid>
   )
 }
 
-export default HomePageAuthorized;
+export default HomePage;

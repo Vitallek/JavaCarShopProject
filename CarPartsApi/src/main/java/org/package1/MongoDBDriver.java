@@ -16,12 +16,13 @@ import static com.mongodb.client.model.Filters.eq;
 public class MongoDBDriver {
     private static final Gson gson = new Gson();
     private static final String DB_URI = "mongodb://localhost:27017";
-    public static final String DB_NAME = "VehicleParts";
+    public static final String DB_NAME = "Vehicles";
     public static final String BRANDS_COL = "Brands";
-    public static final String CALIPERS_COL = "Calipers";
-    public static final String WHEELS_COL = "Wheels";
-    public static final String CONSUMABLE_COL = "Consumable";
-    public static final String BODYKIT_COL = "BodyKit";
+    public static final String SEDAN_COL = "Sedan";
+    public static final String WAGON_COL = "Wagon";
+    public static final String SUV_COL = "SUV";
+    public static final String SPORT_COL = "Sport";
+    public static final String COMPACT_COL = "Compact";
     public static final String USERS = "Userrrs";
     public static String addUserIfNotExist(String email, String password, String role, String token) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
