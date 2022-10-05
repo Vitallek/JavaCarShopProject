@@ -65,6 +65,7 @@ const MultiLevel = ({ item }) => {
   )
 }
 const NavComponent = ({ menu }) => {
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [filteredMenu, setFilteredMenu] = useState([])
   useDebounce(() => {
@@ -73,9 +74,10 @@ const NavComponent = ({ menu }) => {
     )
   }, [menu, search], 800)
   return (
-    <Grid sx={{ maxWidth: 250, minWidth: 216 }} className='navContainer'>
+    <>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 1 }}>
         <Box
+          onClick={() => navigate('/')}
           component="img"
           sx={{
             height: 200,
@@ -97,7 +99,7 @@ const NavComponent = ({ menu }) => {
         />
       </Box>
       {filteredMenu ? filteredMenu.map((item, key) => <MenuItem key={key} item={item} />) : 'nothing'}
-    </Grid>
+    </>
   )
 }
 export default NavComponent

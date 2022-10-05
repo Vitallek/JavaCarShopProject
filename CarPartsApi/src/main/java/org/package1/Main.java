@@ -61,27 +61,9 @@ public class Main {
             return gson.toJson(new LoginResponse(msg).toString());
         });
         get("/get-all/:coll",(req,res) -> {
-            switch (req.params(":coll")) {
-                case "brands":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.BRANDS_COL);
-                }
-                case "sedan":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.SEDAN_COL);
-                }
-                case "wagon":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.WAGON_COL);
-                }
-                case "suv":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.SUV_COL);
-                }
-                case "sport":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.SPORT_COL);
-                }
-                case "compact":{
-                    return MongoDBDriver.getAllOfProductType(MongoDBDriver.COMPACT_COL);
-                }
-                default: return "";
-            }
+            System.out.println(req.params(":coll").toLowerCase());
+            res.status(200);
+            return MongoDBDriver.getAllOfProductType(req.params(":coll").toLowerCase());
         });
     }
 }

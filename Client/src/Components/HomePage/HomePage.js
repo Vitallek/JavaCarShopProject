@@ -1,6 +1,6 @@
 import React from 'react';
 import Cookies from 'js-cookie';
-import { Grid } from '@mui/material';
+import { Button } from '@mui/material';
 
 const menuExample = [
   {
@@ -116,12 +116,17 @@ const Logout = () => {
   Cookies.remove('token')
   window.location.reload()
 }
+const Login = () => {
+  window.location.href = '/login'
+}
 
 const HomePage = () => {
   return (
-    <Grid container>
+    <>
       home page content
-    </Grid>
+      <Button variant='contained' onClick={() => Logout()}>logout</Button>
+      <Button variant='contained' onClick={() => Login()}>login</Button>
+    </>
   )
 }
 
