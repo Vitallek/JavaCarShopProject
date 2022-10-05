@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Cookies from "js-cookie";
 //routes
-import HomePageAuthorized from "./HomePage/HomePage";
+import HomePage from "./HomePage/HomePage";
 // import CreateReserveFromPricelist from "./CreateReserveFromPricelist/CreateReserveFromPricelist";
 // import TradeicsbelMain from "./Tradeicsbel/TradeicsbelMain";
 // import { GetCart } from "./Utility/CallCart";

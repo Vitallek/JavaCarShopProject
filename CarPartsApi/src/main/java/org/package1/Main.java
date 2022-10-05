@@ -60,8 +60,8 @@ public class Main {
             String msg = MongoDBDriver.tokenLogin(user.email, user.password);
             return gson.toJson(new LoginResponse(msg).toString());
         });
-        get("/get-all/:type",(req,res) -> {
-            switch (req.params(":type")) {
+        get("/get-all/:coll",(req,res) -> {
+            switch (req.params(":coll")) {
                 case "brands":{
                     return MongoDBDriver.getAllOfProductType(MongoDBDriver.BRANDS_COL);
                 }

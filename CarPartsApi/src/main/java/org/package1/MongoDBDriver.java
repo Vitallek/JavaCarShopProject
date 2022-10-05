@@ -15,7 +15,7 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class MongoDBDriver {
     private static final Gson gson = new Gson();
-    private static final String DB_URI = "mongodb://localhost:27017";
+    private static final String DB_URI = "mongodb://localhost:3002";
     public static final String DB_NAME = "Vehicles";
     public static final String BRANDS_COL = "Brands";
     public static final String SEDAN_COL = "Sedan";

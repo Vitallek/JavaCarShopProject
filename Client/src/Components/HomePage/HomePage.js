@@ -1,25 +1,126 @@
 import React from 'react';
 import Cookies from 'js-cookie';
+import { Grid } from '@mui/material';
 
-import NavComponent from '../NavBars/NavComponent';
-import { Grid, Button, Link, Stack } from '@mui/material';
-import '../../App.css'
-import '@fontsource/roboto/400.css';
-import { Box } from '@mui/system';
+const menuExample = [
+  {
+    //   icon: <HomeRoundedIcon />,
+    title: 'Home',
+    to: '/',
+    items: []
+  },
+  {
+    //   icon: <HomeRoundedIcon />,
+    title: 'Wheels',
+    to: '/wheels',
+    items: []
+  },
+  {
+    //   icon: <HomeRoundedIcon />,
+    title: 'BodyKits',
+    to: '/bodyKit',
+    items: []
+  },
+  {
+    //   icon: <HomeRoundedIcon />,
+    title: 'Consumables',
+    to: '/consumables',
+    items: []
+  },
+  {
+    //   icon: <HomeRoundedIcon />,
+    title: 'Calipers',
+    to: '/calipers',
+    items: []
+  },
 
+  // {
+  //   icon: <WarehouseRoundedIcon />,
+  //   title: 'Склад',
+  //   to: '/warehouse',
+  //   items: [
+  //     {
+  //       title: 'Склад',
+  //       to: '/warehouse/main',
+  //       items: []
+  //     },
+  //     {
+  //       title: 'История',
+  //       to: '/warehouse/history',
+  //       items: []
+  //     },
+  //     {
+  //       title: 'МультиПоиск',
+  //       to: '/warehouse/multi-search',
+  //       items: []
+  //     },
+  //   ]
+  // },
+  // {
+  //   icon: <img src='https://mstatic.wbstatic.net/suppliers-portal-root/v1.21.5/icons/ios/20.png'/>,
+  //   title: 'Wildberries',
+  //   to: '/wb',
+  //   items: [
+  //     {
+  //       title: 'Склад',
+  //       to: '/wb/warehouse',
+  //       items: []
+  //     },
+  //     {
+  //       title: 'Поставка',
+  //       to: '/wb/supply',
+  //       items: []
+  //     },
+  //     {
+  //       title: 'Отчёты и накладные',
+  //       to: '/wb/orders_invoices_comparison',
+  //       items: []
+  //     },
+  //     {
+  //       title: 'Аналитика',
+  //       to: '/wb/analytics',
+  //       items: []
+  //     },
+  //   ]
+  // },
+  // {
+  //   icon: <ShoppingCartRoundedIcon />,
+  //   title: 'Корзина',
+  //   to: '/cart',
+  //   items: []
+  // },
+  // {
+  //   // icon: <LocalLibraryOutlinedIcon />,
+  //   title: 'Tradeicsbel B2B API',
+  //   to: '/tradeicsbel',
+  //   items: [
+  //     {
+  //       title: 'Резервы',
+  //       to: '/tradeicsbel/get_reserves',
+  //       items: []
+  //     },
+  //     {
+  //       title: 'Собрать заказ (Все товары)',
+  //       to: '/tradeicsbel/create_reserve_from_pricelist',
+  //       items: []
+  //     },
+  //     {
+  //       title: 'Собрать заказ (Каталог)',
+  //       to: '/tradeicsbel/create_reserve_from_catalog',
+  //       items: []
+  //     },
+  //   ]
+  // },
+]
 const Logout = () => {
   Cookies.remove('token')
   window.location.reload()
 }
 
 const HomePage = () => {
-  
   return (
     <Grid container>
-      <Grid item xs={1.7}>
-        {/* <NavSidebar/> */}
-        <NavComponent/>
-      </Grid>
+      home page content
     </Grid>
   )
 }
