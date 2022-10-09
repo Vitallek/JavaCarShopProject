@@ -59,12 +59,6 @@ const SignUp = ({ switchForm }) => {
           alignItems: 'center',
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          {'Регистрация'}
-        </Typography>
         <Box component="form" noValidate sx={{ mt: 1 }}>
           <TextField
             onKeyDown={(e) => {handleEnterPush(e, passwordInput.current.value, emailInput.current.value)}}
@@ -99,13 +93,13 @@ const SignUp = ({ switchForm }) => {
           >
             {'Зарегистрироваться'}
           </Button>
-          <Grid container justifyContent="flex-end">
+          {/* <Grid container justifyContent="flex-end">
             <Grid item>
-              <Button variant="outlined" onClick={switchForm}>
+              <Button variant="outlined" onClick={() => {switchForm(prev => ({...prev, type: 0}))}}>
                 {"Уже есть аккаунт?"}
               </Button>
             </Grid>
-          </Grid>
+          </Grid> */}
         </Box>
       </Box>
     </Container>

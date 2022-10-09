@@ -49,9 +49,7 @@ public class Main {
         });
         post("/login", (req,res) -> {
             User user = gson.fromJson(req.body(), User.class);
-            String token = JWTDriver.createToken(user.email, user.password, user.role);
-            String msg = MongoDBDriver.manualLogin(user.email, user.password, user.role, token);
-            return gson.toJson(new LoginResponse(msg, token).toString());
+            return MongoDBDriver.manualLogin(user.email, user.password);
         });
         post("/token-login", (req,res) -> {
             String token = req.body();

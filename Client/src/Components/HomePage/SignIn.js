@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import {LogIn} from '../Utility/LoginAndRegister';
+import { LogIn } from '../Utility/LoginAndRegister';
 import Cookies from 'js-cookie'
 
 import Avatar from '@mui/material/Avatar';
@@ -14,11 +14,11 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import axios from 'axios'
 //hash function
-import {sha256} from 'crypto-hash'
+import { sha256 } from 'crypto-hash'
 
 const enterKey = 13
 const handleEnterPush = (e, passwordInput, emailInput) => {
-  if(e.keyCode === enterKey) LogInOnClick(passwordInput, emailInput)
+  if (e.keyCode === enterKey) LogInOnClick(passwordInput, emailInput)
 }
 
 const LogInOnClick = (passwordInput, emailInput) => {
@@ -27,15 +27,14 @@ const LogInOnClick = (passwordInput, emailInput) => {
     axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/login`, {
       email: emailInput,
       password: passwordHash,
-      role: 'user'
     }).then(response => {
       const responseJSON = JSON.parse(response.data)
       console.log(responseJSON)
-      if(responseJSON.msg.code === 401) {
+      if (responseJSON.msg.code === 401) {
         alert('Password incorrect')
         return
       }
-      if(responseJSON.msg.code === 409) {
+      if (responseJSON.msg.code === 409) {
         alert('No user found')
         return
       }
@@ -49,78 +48,72 @@ const LogInOnClick = (passwordInput, emailInput) => {
   })
 }
 
-const SignIn = ({switchForm}) => {
+const SignIn = () => {
   const emailInput = useRef(null)
   const passwordInput = useRef(null)
 
   return (
     <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            {'Вход в личный кабинет'}
-          </Typography>
-          <Box component="form" noValidate sx={{ mt: 1 }}>
-            <TextField
-              onKeyDown={e => handleEnterPush(e, passwordInput.current.value, emailInput.current.value)}
-              margin="normal"
-              required
-              fullWidth
-              inputRef={emailInput}
-              label="Имя"
-              name="username"
-              autoFocus
-            />
-            <TextField
-              onKeyDown={e => handleEnterPush(e, passwordInput.current.value, emailInput.current.value)}
-              margin="normal"
-              required
-              fullWidth
-              inputRef={passwordInput}
-              label="Пароль"
-              name="password"
-              type="password"
-            />
-            {/* <FormControlLabel
+      <CssBaseline />
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Box component="form" noValidate sx={{ mt: 1 }}>
+          <TextField
+            onKeyDown={e => handleEnterPush(e, passwordInput.current.value, emailInput.current.value)}
+            margin="normal"
+            required
+            fullWidth
+            inputRef={emailInput}
+            label="Имя"
+            name="username"
+            autoFocus
+          />
+          <TextField
+            onKeyDown={e => handleEnterPush(e, passwordInput.current.value, emailInput.current.value)}
+            margin="normal"
+            required
+            fullWidth
+            inputRef={passwordInput}
+            label="Пароль"
+            name="password"
+            type="password"
+          />
+          {/* <FormControlLabel
               control={
               <Checkbox   inputRef={rememberMe} 
                           color="primary" />
               }
               label="Запомнить меня"
             /> */}
-            <Button
-              onClick={() => LogInOnClick(passwordInput.current.value, emailInput.current.value)}
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              {'Войти'}
-            </Button>
-            <Grid container>
-              <Grid item xs={6}>
-                <Button variant="outlined" onClick={() => {alert('Telegram @Vitallek')}}>
-                  {'Забыли пароль?'}
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Button variant="outlined" onClick={switchForm}>
-                  {"Зарегистрироваться"}
-                </Button>
-              </Grid>
+          <Button
+            onClick={() => LogInOnClick(passwordInput.current.value, emailInput.current.value)}
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            {'Войти'}
+          </Button>
+          {/* <Grid container>
+            <Grid item xs={6}>
+              <Button variant="outlined" onClick={() => { alert('Telegram @Vitallek') }}>
+                {'Забыли пароль?'}
+              </Button>
             </Grid>
-          </Box>
+            <Grid item xs={6}>
+              <Button variant="outlined" onClick={() => {switchForm(prev => ({...prev, type: 1}))}}>
+                {"Зарегистрироваться"}
+              </Button>
+            </Grid>
+          </Grid> */}
         </Box>
-      </Container>
+      </Box>
+    </Container>
   );
 }
 

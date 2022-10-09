@@ -22,7 +22,7 @@ const hasChildren = (item) => {
 
   return true
 }
-const MenuItem = ({ item }) => {
+const CustomMenuItem = ({ item }) => {
   const Component = hasChildren(item) ? MultiLevel : SingleLevel
   return <Component item={item} />
 }
@@ -57,7 +57,7 @@ const MultiLevel = ({ item }) => {
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {children.map((child, key) => (
-            <MenuItem key={key} item={child} />
+            <CustomMenuItem key={key} item={child} />
           ))}
         </List>
       </Collapse>
@@ -98,7 +98,7 @@ const NavComponent = ({ menu }) => {
           onChange={e => setSearch(e.target.value)}
         />
       </Box>
-      {filteredMenu ? filteredMenu.map((item, key) => <MenuItem key={key} item={item} />) : 'nothing'}
+      {filteredMenu ? filteredMenu.map((item, key) => <CustomMenuItem key={key} item={item} />) : 'nothing'}
     </>
   )
 }

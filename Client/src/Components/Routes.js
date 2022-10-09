@@ -3,11 +3,12 @@ import { BrowserRouter, Routes, Route, useRoutes } from "react-router-dom";
 import axios from 'axios';
 import { Grid } from "@mui/material";
 import ProtectedRoutes from "./ProtectedRoutes";
-import NavComponent from './NavBars/NavComponent'
-import { RoleContext } from "../RoleContext";
+import NavComponent from './Navigation/NavComponent'
+import { UserInfoContext } from "../UserInfoContext";
 import HomePage from "./HomePage/HomePage";
 import AllFromBrandComponent from "./AllProductsComponent/AllFromBrandComponent";
-import HomePageUnauthorized from "./HomePage/HomePageUnauthorized";
+import TopNavComponent from "./Navigation/TopNavComponent";
+import FooterComponent from "./Navigation/FooterComponent";
 
 const processBrandsList = (brands) => {
   const menu = []
@@ -23,7 +24,7 @@ const processBrandsList = (brands) => {
 }
 
 const CustomRoutes = ({}) => {
-  const props = useContext(RoleContext)
+  const props = useContext(UserInfoContext)
 
   const [menu, setMenu] = useState(['Empty'])
   const [brands, setBrands] = useState([])
@@ -48,12 +49,11 @@ const CustomRoutes = ({}) => {
         </Grid>
         <Grid container item xs={9.5} direction='column' flexWrap='nowrap'>
           <Grid item xs={12} sx={{maxHeight: 50}}>
-            top nav bar
+            <TopNavComponent authorized={props.auth}/>
           </Grid>
           <Grid item xs={12}>
             <Routes>
               <Route path='/' element={<HomePage />} />
-              <Route path='/login' element={<HomePageUnauthorized />} />
               <Route path='/vehicles'>
                 <Route path='/vehicles/:brand' element={<AllFromBrandComponent brands={brands}/>}/>
               </Route>
@@ -61,6 +61,10 @@ const CustomRoutes = ({}) => {
             </Routes>
           </Grid>
         </Grid>
+      </Grid>
+      <Grid item xs={12} sx={{maxHeight: 50}}>
+        footer
+        <FooterComponent/>
       </Grid>
     </BrowserRouter>
   )

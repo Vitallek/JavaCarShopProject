@@ -6,6 +6,7 @@ import com.mongodb.client.*;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.package1.utility.LoginResponse;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -67,7 +68,7 @@ public class MongoDBDriver {
             return null;
         }
     }
-    public static String manualLogin(String email, String password, String role,String token) {
+    public static String manualLogin(String email, String password) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(USERS);
@@ -75,7 +76,9 @@ public class MongoDBDriver {
             Document doc = collection.find(eq("email", email)).first();
             if(doc == null) return "{\"desc\": \"no user found\", \"code\": 409}";
             if(!Objects.equals(doc.getString("password"), password)) return "{\"desc\": \"password incorrect\", \"code\": 401}";
-            return "{\"desc\": \"successful\",\"role\":\""+doc.getString("role")+"\", \"code\": 200}";
+            String token = JWTDriver.createToken(doc.getString("email"), doc.getString("password"), doc.getString("role"));
+            String msg = "{\"desc\": \"successful\",\"role\":\""+doc.getString("role")+"\", \"code\": 200}";
+            return gson.toJson(new LoginResponse(msg, token).toString());
         } catch (Exception e) {
             System.out.println(e);
             return null;

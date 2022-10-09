@@ -1,13 +1,12 @@
 import './App.css'
 import Cookies from 'js-cookie'
 import React, {useState, useEffect} from 'react'
-import { RoleContext } from './RoleContext'
+import { UserInfoContext } from './UserInfoContext'
 import CustomRoutes from './Components/Routes'
 import axios from 'axios'
 
 const App = () => {
 
-  const [authorized, setAuthorized] = useState(false)
   let [contextObject, setContextObject] = useState({})
 
   useEffect(() => {
@@ -16,16 +15,18 @@ const App = () => {
       axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/token-login`, cookies.token).then(response => {
         const responseJSON = JSON.parse(response.data)
         console.log(responseJSON)
-        setContextObject({role: responseJSON.msg.role})
-        if(responseJSON.msg.code === 200) setAuthorized(true)
+        setContextObject({auth: true, role: responseJSON.msg.role})
+        // if(responseJSON.msg.code === 200) setAuthorized(true)
       })
+      return
     }
+    setContextObject({auth: false, role: 'unauth'})
   },[])
 
   return (
-    <RoleContext.Provider value={contextObject}>
+    <UserInfoContext.Provider value={contextObject}>
       <CustomRoutes/>
-    </RoleContext.Provider>
+    </UserInfoContext.Provider>
   )
 }
 
