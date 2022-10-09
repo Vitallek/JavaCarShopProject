@@ -30,12 +30,12 @@ const CustomRoutes = ({}) => {
   const [brands, setBrands] = useState([])
 
   useEffect(() => {
-    let mouted = true
-    if(!mouted) return
+    let mounted = true
+    if(!mounted) return
     axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/brands`)
       .then(res => setBrands(res.data))
       .catch(err => alert('error occured'))
-    return () => mouted = false
+    return () => mounted = false
   },[])
 
   useEffect(() => {
