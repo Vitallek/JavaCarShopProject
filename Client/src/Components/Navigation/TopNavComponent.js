@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Menu, MenuItem, Button, Stack, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material"
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
@@ -6,10 +6,12 @@ import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import DirectionsCarRoundedIcon from '@mui/icons-material/DirectionsCarRounded';
+import SupervisorAccountRoundedIcon from '@mui/icons-material/SupervisorAccountRounded';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import '@fontsource/roboto/400.css';
 import SignInDialog from "../HomePage/SignInDialog";
 import Cookies from "js-cookie";
+import { UserInfoContext } from "../../UserInfoContext";
 
 const menu = [
   {
@@ -64,37 +66,39 @@ const SingleLevel = ({ item }) => {
     </ListItemButton>
   )
 }
-const TopNavComponent = ({ authorized }) => {
+const handleOpenMenu = (event,setAnchorEl) => {
+  setAnchorEl(event.currentTarget)
+}
+const handleCloseMenu = (setAnchorEl) => {
+  setAnchorEl(null)
+}
+const handleOpenSignIn = (setDialogOpen,setAnchorEl) => {
+  setDialogOpen({
+    isOpen: true,
+    type: 0
+  })
+  setAnchorEl(null)
+}
+const handleOpenReg = (setDialogOpen,setAnchorEl) => {
+  setDialogOpen({
+    isOpen: true,
+    type: 1
+  })
+  setAnchorEl(null)
+}
+const TopNavComponent = ({ authorized, role }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const isMenuOpened = Boolean(anchorEl)
+  const navigate = useNavigate()
   const [dialogOpen, setDialogOpen] = useState({ isOpen: false, type: 0 })
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handleCloseMenu = () => {
-    setAnchorEl(null)
-  }
-  const handleOpenSignIn = () => {
-    setDialogOpen({
-      isOpen: true,
-      type: 0
-    })
-    setAnchorEl(null)
-  }
-  const handleOpenReg = () => {
-    setDialogOpen({
-      isOpen: true,
-      type: 1
-    })
-    setAnchorEl(null)
-  }
+ 
   const AuthMenu = () => {
     return (
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
         open={isMenuOpened}
-        onClose={handleCloseMenu}
+        onClose={() => handleCloseMenu(setAnchorEl)}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
@@ -107,6 +111,19 @@ const TopNavComponent = ({ authorized }) => {
             Ваш аккаунт
           </ListItemText>
         </MenuItem>
+        {role === 'admin' || role === 'head_cheater' ? 
+          <MenuItem onClick={() => {
+            handleCloseMenu(setAnchorEl)
+            navigate('/adm')
+          }}>
+            <ListItemIcon>
+              <SupervisorAccountRoundedIcon />
+            </ListItemIcon>
+            <ListItemText>
+              Админка
+            </ListItemText>
+          </MenuItem>: null
+        }
         <MenuItem onClick={() => {alert('todo')}}>
           <ListItemIcon>
             <FavoriteRoundedIcon />
@@ -140,7 +157,7 @@ const TopNavComponent = ({ authorized }) => {
         id="basic-menu"
         anchorEl={anchorEl}
         open={isMenuOpened}
-        onClose={handleCloseMenu}
+        onClose={() => handleCloseMenu(setAnchorEl)}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
@@ -151,7 +168,7 @@ const TopNavComponent = ({ authorized }) => {
         >
           Меню
         </Typography>
-        <MenuItem onClick={handleOpenSignIn}>
+        <MenuItem onClick={() => handleOpenSignIn(setDialogOpen,setAnchorEl)}>
           <ListItemIcon>
             <LoginRoundedIcon />
           </ListItemIcon>
@@ -159,7 +176,7 @@ const TopNavComponent = ({ authorized }) => {
             Войти
           </ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleOpenReg}>
+        <MenuItem onClick={() => handleOpenReg(setDialogOpen,setAnchorEl)}>
           <ListItemIcon>
             <AccountCircleRoundedIcon />
           </ListItemIcon>
@@ -181,7 +198,7 @@ const TopNavComponent = ({ authorized }) => {
         aria-controls={isMenuOpened ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={isMenuOpened ? 'true' : undefined}
-        onClick={handleOpenMenu}
+        onClick={(e) => handleOpenMenu(e, setAnchorEl)}
       >
       </Button>
       {authorized ? <AuthMenu /> : <UnAuthMenu />}

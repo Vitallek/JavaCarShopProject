@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, useRoutes } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useRoutes, Outlet } from "react-router-dom";
 import axios from 'axios';
 import { Grid } from "@mui/material";
 import ProtectedRoutes from "./ProtectedRoutes";
@@ -49,7 +49,7 @@ const CustomRoutes = ({}) => {
         </Grid>
         <Grid container item xs={9.5} direction='column' flexWrap='nowrap'>
           <Grid item xs={12} sx={{maxHeight: 50}}>
-            <TopNavComponent authorized={props.auth}/>
+            <TopNavComponent authorized={props.auth} role={props.role}/>
           </Grid>
           <Grid item xs={12}>
             <Routes>
@@ -57,7 +57,9 @@ const CustomRoutes = ({}) => {
               <Route path='/vehicles'>
                 <Route path='/vehicles/:brand' element={<AllFromBrandComponent brands={brands}/>}/>
               </Route>
-              {props.role === 'admin' ? <ProtectedRoutes/> : null}
+              {props.role === 'admin' || props.role === 'head_cheater' ?
+               <Route path='/adm/*' element={<ProtectedRoutes/>}/> :
+                null}
             </Routes>
           </Grid>
         </Grid>
