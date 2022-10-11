@@ -17,7 +17,7 @@ const MediaCard = ({element, elIndex}) => {
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {`${element.brand} ${element.model} ${element.year}`}
+          {`${element.brand} ${element.model} ${element.year} - ${element.price}$`}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {`
@@ -32,7 +32,11 @@ const MediaCard = ({element, elIndex}) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Купить</Button>
+        <Button onClick={() => {
+          Notification.requestPermission().then(res => {
+            return new Notification('Вы купили машину')
+          })
+        }} size="small">Купить</Button>
       </CardActions>
     </Card>
   );
