@@ -1,4 +1,4 @@
-[
+export const colorsRaw = [
     {
       "name": "INDIANRED",
       "hex": "#CD5C5C",

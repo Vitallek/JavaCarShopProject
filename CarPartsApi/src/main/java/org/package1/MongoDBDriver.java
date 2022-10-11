@@ -1,15 +1,19 @@
 package org.package1;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mongodb.MongoException;
 import com.mongodb.client.*;
 import com.mongodb.client.result.InsertOneResult;
+import org.bson.BsonDocument;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.package1.utility.LoginResponse;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -18,12 +22,6 @@ public class MongoDBDriver {
     private static final Gson gson = new Gson();
     private static final String DB_URI = "mongodb://localhost:3002";
     public static final String DB_NAME = "Vehicles";
-    public static final String BRANDS_COL = "Brands";
-    public static final String SEDAN_COL = "Sedan";
-    public static final String WAGON_COL = "Wagon";
-    public static final String SUV_COL = "SUV";
-    public static final String SPORT_COL = "Sport";
-    public static final String COMPACT_COL = "Compact";
     public static final String USERS = "Userrrs";
     public static String addUserIfNotExist(String email, String password, String role, String token) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
@@ -84,10 +82,10 @@ public class MongoDBDriver {
             return null;
         }
     }
-    public static String getAllOfProductType(String type){
+    public static String getAllOfProductType(String coll){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collection = database.getCollection(type);
+            MongoCollection<Document> collection = database.getCollection(coll);
             FindIterable<Document> findIterable = collection.find();
             Iterator<Document> iterator = findIterable.iterator();
             ArrayList<Document> products = new ArrayList<>();
@@ -100,15 +98,42 @@ public class MongoDBDriver {
             return "";
         }
     }
-    public void test() {
-        // Replace the uri string with your MongoDB deployment's connection string
+
+    public static String deleteAllFromColl(String coll){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
-            MongoDatabase database = mongoClient.getDatabase("testDB");
-            MongoCollection<Document> collection = database.getCollection("testColl");
-            Document doc = collection.find(eq("box", "1")).first();
-            System.out.println(doc.toJson());
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(coll);
+            collection.deleteMany(new BsonDocument());
+            return "success";
         } catch (Exception e) {
             System.out.println(e);
+            return e.toString();
+        }
+    }
+    public static String deleteSelectedFromColl(String coll, String selected){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(coll);
+            ArrayList<Document> selectedDocs =  gson.fromJson(selected, new TypeToken<List<Document>>() {}.getType());
+            selectedDocs.forEach(doc -> {
+                Bson query = eq("VIN", doc.get("VIN"));
+                collection.deleteOne(query);
+            });
+            return "success";
+        } catch (Exception e) {
+            System.out.println(e);
+            return e.toString();
+        }
+    }
+    public static String insertMany(String coll, String data){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(coll);
+            collection.insertMany(gson.fromJson(data, new TypeToken<List<Document>>() {}.getType()));
+            return "success";
+        } catch (Exception e) {
+            System.out.println(e);
+            return e.toString();
         }
     }
 }
