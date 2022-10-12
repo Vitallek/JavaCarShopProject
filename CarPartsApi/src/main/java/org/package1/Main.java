@@ -111,10 +111,18 @@ public class Main {
             res.status(500);
             return "error";
         });
-        post("add-brand", (req,res) -> {
-            MongoDBDriver.addColl(req.body());
-            res.status(200);
-            return "success";
+//        post("add-brand", (req,res) -> {
+//            MongoDBDriver.addColl(req.body());
+//            res.status(200);
+//            return "success";
+//        });
+        put("update-col/:brand",(req,res) -> {
+            if (MongoDBDriver.update(req.params(":brand").toLowerCase(), req.body()).equals("success")) {
+                res.status(200);
+                return "success";
+            }
+            res.status(500);
+            return "error";
         });
     }
 }

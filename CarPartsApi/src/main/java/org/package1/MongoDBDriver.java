@@ -6,11 +6,13 @@ import com.mongodb.MongoException;
 import com.mongodb.client.*;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.json.JSONObject;
 import org.package1.utility.LoginResponse;
 
 import java.util.ArrayList;
@@ -143,6 +145,19 @@ public class MongoDBDriver {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             collection.createIndex(Indexes.ascending("VIN"), new IndexOptions().unique(true));
+            return "success";
+        } catch (Exception e) {
+            System.out.println(e);
+            return e.toString();
+        }
+    }
+    public static String update(String coll, String data){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(coll);
+            JSONObject dataJson = new JSONObject(data);
+            Document query = new Document().append("VIN",  dataJson.get("rowData"));
+            collection.updateOne(query, Updates.set(dataJson.get("field").toString(),dataJson.get("value").toString()));
             return "success";
         } catch (Exception e) {
             System.out.println(e);

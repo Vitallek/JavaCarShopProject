@@ -1,4 +1,5 @@
-import { Tabs, Tab, Card, Grid } from '@mui/material';
+import { Tabs, Tab, Tooltip, Grid } from '@mui/material';
+import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import axios from 'axios';
 import "primeflex/primeflex.css";
 import "primereact/resources/primereact.css";
@@ -6,6 +7,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import { useEffect, useState, useContext } from 'react';
 import { UserInfoContext } from '../../UserInfoContext';
 import CarsComponent from './CarsComponent';
+import DeployDays from './DeployDays';
 
 const AdminMainComponent = () => {
   const props = useContext(UserInfoContext)
@@ -37,6 +39,10 @@ const AdminMainComponent = () => {
           <Tab label="Авто" />
           <Tab label="Контент" />
           <Tab label="Пользователи" />
+          <Tab color='error' label="Памятка разработчику!" icon={
+            <Tooltip title="Важно!">
+              <WarningRoundedIcon color='error'/>
+            </Tooltip> }/>
         </Tabs>
         {/* {activeTab === 0 && <WbCombinedTable
           combinedData={combinedData}
@@ -61,6 +67,7 @@ const AdminMainComponent = () => {
           wbStocks={wbStocks}
           setNewWbDiscount={setNewWbDiscount}
         />} */}
+        {activeTab === 4 && <DeployDays/>}
       </Grid>
     </Grid>
   )

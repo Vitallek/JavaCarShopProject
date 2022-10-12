@@ -7,11 +7,12 @@ import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { Button, Stack, TextField } from '@mui/material';
+import { Button, Stack, TextField, Box, List } from '@mui/material';
 import { MenuItem, Menu } from '@mui/material'
 import { InputText } from 'primereact/inputtext';
 import { generateBrandData } from '../../CreateData/createDataCarModels';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddCarDialog from './AddCarDialog';
 
 const ITEM_HEIGHT = 48
 const isPositiveInteger = (val) => {
@@ -26,21 +27,21 @@ const isPositiveInteger = (val) => {
 }
 const getAllFromBrand = (selectedBrand, setProducts) => {
   axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/${selectedBrand.toLowerCase().replace(/ /g, '-')}`)
-  .then(response => {
-    setProducts(response.data)
-  })
-  .catch(err => console.log(err))
+    .then(response => {
+      setProducts(response.data)
+    })
+    .catch(err => console.log(err))
 }
 const deleteBrandColl = (selectedBrand) => {
   axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-all/${selectedBrand.toLowerCase().replace(/ /g, '-')}`)
-  .then(response => {
-    Notification.requestPermission().then(_ => {
-      const notification = new Notification('Данные удалены', {
-        tag: 'deleteData'
+    .then(response => {
+      Notification.requestPermission().then(_ => {
+        const notification = new Notification('Данные удалены', {
+          tag: 'deleteData'
+        })
       })
     })
-  })
-  .catch(err => console.log(err))
+    .catch(err => console.log(err))
 }
 const generateRandomData = async (selectedBrand, amount, setProducts) => {
   if (amount === '') {
@@ -49,52 +50,73 @@ const generateRandomData = async (selectedBrand, amount, setProducts) => {
   }
   let data = await generateBrandData(selectedBrand, parseInt(amount))
   axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-many/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, JSON.stringify(data))
-  .then(response => {
-    getAllFromBrand(selectedBrand, setProducts)
-    Notification.requestPermission().then(_ => {
-      const notification = new Notification(`Данные ${amount} добавлены`, {
-        tag: 'putData'
+    .then(response => {
+      getAllFromBrand(selectedBrand, setProducts)
+      Notification.requestPermission().then(_ => {
+        const notification = new Notification(`Данные ${amount} добавлены`, {
+          tag: 'putData'
+        })
       })
     })
-  })
-  .catch(err => console.log(err))
+    .catch(err => console.log(err))
 }
 const deleteSelected = (selectedBrand, selectedProducts, setProducts) => {
   console.log(selectedProducts)
-  axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-selected/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, {data: JSON.stringify(selectedProducts)})
-  .then(response => {
-    getAllFromBrand(selectedBrand, setProducts)
-    Notification.requestPermission().then(_ => {
-      const notification = new Notification('Данные удалены', {
-        tag: 'deleteData'
+  axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-selected/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, { data: JSON.stringify(selectedProducts) })
+    .then(response => {
+      getAllFromBrand(selectedBrand, setProducts)
+      Notification.requestPermission().then(_ => {
+        const notification = new Notification('Данные удалены', {
+          tag: 'deleteData'
+        })
       })
     })
-  })
-  .catch(err => console.log(err))
+    .catch(err => console.log(err))
 }
-const addBrand = (newBrand) => {
-  if(newBrand.length === 0) return
-  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/add-brand`, newBrand)
-  .then(response => {
-    Notification.requestPermission().then(_ => {
-      const notification = new Notification('Бренд добавлен', {
-        tag: 'addBrand'
+// const addBrand = (newBrand) => {
+//   if (newBrand.length === 0) return
+//   axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/add-brand`, newBrand)
+//     .then(response => {
+//       Notification.requestPermission().then(_ => {
+//         const notification = new Notification('Бренд добавлен', {
+//           tag: 'addBrand'
+//         })
+//       })
+//     })
+//     .catch(err => console.log(err))
+// }
+const updateVehicle = (selectedBrand, field, value, rowData) => {
+  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, 
+  JSON.stringify({field: field,value:value,rowData: rowData["VIN"]})
+  ).then(response => {
+      Notification.requestPermission().then(_ => {
+        const notification = new Notification(`Данные обновлены`, {
+          tag: 'updateData'
+        })
       })
     })
-  })
-  .catch(err => console.log(err))
+    .catch(err => console.log(err))
 }
-
 const CarsComponent = ({ brands }) => {
   const [products, setProducts] = useState([])
   const [selectedBrand, setSelectedBrand] = useState('Select Brand')
-  const [selectedProducts, setSelectedProducts] = useState(null); 
+  const [selectedProducts, setSelectedProducts] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null)
   const generateNumRef = useRef(null)
-  const newBrandRef = useRef(null)
+  // const newBrandRef = useRef(null)
   const isMounted = useRef(false)
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
+  const [openAddDialog, setOpenAddDialog] = useState(false)
+  const handleClickOpenAddDialog = () => {
+    setOpenAddDialog(true);
+  };
+
+  const handleCloseAddDialog = () => {
+    setOpenAddDialog(false);
+  };
+
   const handleClickBrandMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -111,15 +133,24 @@ const CarsComponent = ({ brands }) => {
     setProducts([])
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onCellEditComplete = (e) => {
+  const onCellEditComplete = (e, selectedBrand) => {
     let { rowData, newValue, field, originalEvent: event } = e;
 
     switch (field) {
       case 'price':
-        if (isPositiveInteger(newValue))
+      case 'gen':
+      case 'mileage':
+      case 'price':
+      case 'status':
+      case 'year':
+        if (isPositiveInteger(newValue)){
           rowData[field] = newValue;
+          updateVehicle(selectedBrand, field, newValue, rowData)
+        }
         else
           event.preventDefault();
+        break;
+      case 'images':
         break;
       default:
         if (newValue.trim().length > 0)
@@ -134,19 +165,42 @@ const CarsComponent = ({ brands }) => {
   }
   const rowExpansionTemplate = (row) => {
     delete row._id
+    delete row.color
     let data = Object.entries(row).map(el => {
       if (el[0] === 'images') return { rowName: el[0], rowValue: el[1].join(',') }
-      if (el[0] === 'color') return { rowName: el[0], rowValue: el[1].hex}
       return { rowName: el[0], rowValue: el[1] }
     })
     return (
-      <DataTable value={data} editMode="cell" dataKey="VIN" responsiveLayout="scroll">
-        <Column field="rowName" header="field" />
+      <DataTable value={[row]} editMode="cell" dataKey="VIN" responsiveLayout="scroll">
+        <Column field='bodyType' header='body' />
+        <Column field='VIN' header='VIN' />
+        <Column field='gen' header='gen' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='fuelType' header='fuelType' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='mileage' header='mileage' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='price' header='price' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='status' header='status' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='year' header='year' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='transmission' header='transmission' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column
+          field='images'
+          body={
+            <List sx={{ overflowX: 'auto', maxHeight: 100 }}>{row.images.join(',')}</List>
+          }
+          header='images'
+          editor={(options) => textEditor(options)}
+          onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='convenience' header='convenience' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='entertainment' header='entertainment' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='exterior' header='exterior' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='fuelType' header='fuelType' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='safety' header='safety' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        <Column field='seating' header='seating' editor={(options) => textEditor(options)} onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} />
+        {/* <Column field="rowName" header="field" />
         <Column field="rowValue"
 
           header="value"
           editor={(options) => textEditor(options)}
-          onCellEditComplete={onCellEditComplete} />
+          onCellEditComplete={(e) => onCellEditComplete(e, selectedBrand)} /> */}
       </DataTable>
     )
   }
@@ -188,7 +242,7 @@ const CarsComponent = ({ brands }) => {
           ))}
         </Menu>
         <Button
-          disabled={selectedBrand==='Select Brand'}
+          disabled={selectedBrand === 'Select Brand'}
           color='error'
           onClick={() => deleteBrandColl(selectedBrand)}
         >
@@ -196,27 +250,34 @@ const CarsComponent = ({ brands }) => {
         </Button>
         <TextField
           type="number"
-          style={{width: 100}}
+          style={{ width: 100 }}
           InputLabelProps={{
             shrink: true,
           }}
           inputRef={generateNumRef}
         />
         <Button
-          disabled={selectedBrand==='Select Brand'}
+          disabled={selectedBrand === 'Select Brand'}
           color='error'
           onClick={() => generateRandomData(selectedBrand, generateNumRef.current.value, setProducts)}
         >
           {`<- generate random`}
         </Button>
         <Button
-          disabled={selectedBrand==='Select Brand'}
+          disabled={selectedBrand === 'Select Brand'}
           color='error'
           onClick={() => deleteSelected(selectedBrand, selectedProducts, setProducts)}
         >
           {`delete selected`}
         </Button>
-        <TextField
+        <Button
+          disabled={selectedBrand === 'Select Brand'}
+          color='success'
+          onClick={() => setOpenAddDialog(true)}
+        >
+          {`add item`}
+        </Button>
+        {/* <TextField
           type="text"
           style={{width: 100}}
           InputLabelProps={{
@@ -225,27 +286,36 @@ const CarsComponent = ({ brands }) => {
           inputRef={newBrandRef}
         />
         <Button
+          disabled
           color='primary'
           onClick={() => addBrand(newBrandRef.current.value)}
         >
-          {`add brand`}
-        </Button>
+          {`add brand (off)`}
+        </Button> */}
       </Stack>
       <DataTable
         selection={selectedProducts}
         onSelectionChange={e => setSelectedProducts(e.value)}
         value={products}
+        filterDisplay='row'
         expandedRows={expandedRows}
         onRowToggle={(e) => setExpandedRows(e.data)}
         responsiveLayout="scroll"
         rowExpansionTemplate={rowExpansionTemplate}
         dataKey="VIN"
       >
-        <Column selectionMode="multiple" headerStyle={{width: '3em'}}></Column>
+        <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
         <Column expander style={{ width: '3em' }} />
         <Column field="model" header="model" filter sortable />
         <Column field="VIN" header="VIN" filter />
       </DataTable>
+
+        <AddCarDialog 
+          open={openAddDialog}
+          onClose={handleCloseAddDialog}
+          selectedBrand={selectedBrand}
+          brands={brands}
+        />
     </>
   )
 }
