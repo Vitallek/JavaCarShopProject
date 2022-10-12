@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mongodb.MongoException;
 import com.mongodb.client.*;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonDocument;
 import org.bson.Document;
@@ -130,6 +132,17 @@ public class MongoDBDriver {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             collection.insertMany(gson.fromJson(data, new TypeToken<List<Document>>() {}.getType()));
+            return "success";
+        } catch (Exception e) {
+            System.out.println(e);
+            return e.toString();
+        }
+    }
+    public static String addColl(String coll){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(coll);
+            collection.createIndex(Indexes.ascending("VIN"), new IndexOptions().unique(true));
             return "success";
         } catch (Exception e) {
             System.out.println(e);

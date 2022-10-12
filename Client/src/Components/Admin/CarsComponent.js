@@ -72,6 +72,18 @@ const deleteSelected = (selectedBrand, selectedProducts, setProducts) => {
   })
   .catch(err => console.log(err))
 }
+const addBrand = (newBrand) => {
+  if(newBrand.length === 0) return
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/add-brand`, newBrand)
+  .then(response => {
+    Notification.requestPermission().then(_ => {
+      const notification = new Notification('Бренд добавлен', {
+        tag: 'addBrand'
+      })
+    })
+  })
+  .catch(err => console.log(err))
+}
 
 const CarsComponent = ({ brands }) => {
   const [products, setProducts] = useState([])
@@ -79,6 +91,7 @@ const CarsComponent = ({ brands }) => {
   const [selectedProducts, setSelectedProducts] = useState(null); 
   const [expandedRows, setExpandedRows] = useState(null)
   const generateNumRef = useRef(null)
+  const newBrandRef = useRef(null)
   const isMounted = useRef(false)
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -202,6 +215,20 @@ const CarsComponent = ({ brands }) => {
           onClick={() => deleteSelected(selectedBrand, selectedProducts, setProducts)}
         >
           {`delete selected`}
+        </Button>
+        <TextField
+          type="text"
+          style={{width: 100}}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          inputRef={newBrandRef}
+        />
+        <Button
+          color='primary'
+          onClick={() => addBrand(newBrandRef.current.value)}
+        >
+          {`add brand`}
         </Button>
       </Stack>
       <DataTable

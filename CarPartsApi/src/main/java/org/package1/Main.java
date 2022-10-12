@@ -1,7 +1,6 @@
 package org.package1;
 
 import com.google.gson.Gson;
-import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -10,12 +9,6 @@ import org.package1.utility.RegisterResponse;
 import org.package1.utility.User;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
 
 import static spark.Spark.*;
 
@@ -117,6 +110,11 @@ public class Main {
             }
             res.status(500);
             return "error";
+        });
+        post("add-brand", (req,res) -> {
+            MongoDBDriver.addColl(req.body());
+            res.status(200);
+            return "success";
         });
     }
 }
