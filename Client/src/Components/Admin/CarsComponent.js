@@ -49,7 +49,7 @@ const generateRandomData = async (selectedBrand, amount, setProducts) => {
     return
   }
   let data = await generateBrandData(selectedBrand, parseInt(amount))
-  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-many/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, JSON.stringify(data))
+  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, JSON.stringify(data))
     .then(response => {
       getAllFromBrand(selectedBrand, setProducts)
       Notification.requestPermission().then(_ => {
@@ -123,6 +123,9 @@ const CarsComponent = ({ brands }) => {
   const handleCloseBrandMenu = () => {
     setAnchorEl(null);
   };
+  const refreshFromDialog = () => {
+    getAllFromBrand(selectedBrand, setProducts)
+  }
   useEffect(() => {
     if (selectedBrand === 'Select Brand') return
     getAllFromBrand(selectedBrand, setProducts)
@@ -315,6 +318,7 @@ const CarsComponent = ({ brands }) => {
           onClose={handleCloseAddDialog}
           selectedBrand={selectedBrand}
           brands={brands}
+          refresh={refreshFromDialog}
         />
     </>
   )

@@ -103,7 +103,7 @@ public class Main {
                 return gson.toJson(response.body().string());
             }
         });
-        put("insert-many/:brand",(req,res) -> {
+        put("insert-to-coll/:brand",(req,res) -> {
             if (MongoDBDriver.insertMany(req.params(":brand").toLowerCase(), req.body()).equals("success")) {
                 res.status(200);
                 return "success";
