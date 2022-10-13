@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from 'axios';
+import { Toast } from 'primereact/toast';
 import { Dialog, DialogTitle, Stack, DialogContent, DialogActions, Button, TextField, Select, MenuItem } from "@mui/material";
 import { Divider } from "@mui/material";
 // const isPositiveInteger = (val) => {
@@ -35,17 +36,13 @@ const cleanObject = (selectedBrand) => ({
   seating: '',
   status: 0
 })
-const addItem = (selectedBrand, itemProps, refresh) => {
+const addItem = (selectedBrand, itemProps, refresh, toast) => {
   const objectToPush = { ...itemProps }
   objectToPush.images = itemProps.images.split(',')
   axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}`,
     JSON.stringify([objectToPush])
   ).then(response => {
-    Notification.requestPermission().then(_ => {
-      const notification = new Notification(`Данные добавлены`, {
-        tag: 'insertData'
-      })
-    })
+    toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные добавлены', position:'bottom-right'});
     refresh()
   })
     .catch(err => console.log(err))
@@ -81,6 +78,7 @@ const TextFieldNoValidate = ({ label, field, prop, setItemProps }) => {
 }
 const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
   const [itemProps, setItemProps] = useState(cleanObject(selectedBrand))
+  const toast = useRef(null)
   useEffect(() => {
     if (selectedBrand === 'Select Brand') return
     console.log(brands)
@@ -92,6 +90,7 @@ const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
       onClose={onClose}
       aria-labelledby="responsive-dialog-title"
     >
+      <Toast ref={toast} position="bottom-right"/>
       <DialogTitle id="responsive-dialog-title">
         {"Добавление нового авто"}
       </DialogTitle>
@@ -186,7 +185,7 @@ const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
         }}>
           Отмена
         </Button>
-        <Button onClick={() => addItem(selectedBrand, itemProps, refresh)}>
+        <Button onClick={() => addItem(selectedBrand, itemProps, refresh, toast)}>
           Добавить
         </Button>
       </DialogActions>

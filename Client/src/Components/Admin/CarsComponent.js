@@ -7,6 +7,7 @@ import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
+import { Toast } from 'primereact/toast';
 import { Button, Stack, TextField, Box, List } from '@mui/material';
 import { MenuItem, Menu } from '@mui/material'
 import { InputText } from 'primereact/inputtext';
@@ -32,18 +33,14 @@ const getAllFromBrand = (selectedBrand, setProducts) => {
     })
     .catch(err => console.log(err))
 }
-const deleteBrandColl = (selectedBrand) => {
+const deleteBrandColl = (selectedBrand, toast) => {
   axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-all/${selectedBrand.toLowerCase().replace(/ /g, '-')}`)
     .then(response => {
-      Notification.requestPermission().then(_ => {
-        const notification = new Notification('Данные удалены', {
-          tag: 'deleteData'
-        })
-      })
+      toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные удалены'});
     })
     .catch(err => console.log(err))
 }
-const generateRandomData = async (selectedBrand, amount, setProducts) => {
+const generateRandomData = async (selectedBrand, amount, setProducts, toast) => {
   if (amount === '') {
     alert('empty input')
     return
@@ -52,24 +49,16 @@ const generateRandomData = async (selectedBrand, amount, setProducts) => {
   axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, JSON.stringify(data))
     .then(response => {
       getAllFromBrand(selectedBrand, setProducts)
-      Notification.requestPermission().then(_ => {
-        const notification = new Notification(`Данные ${amount} добавлены`, {
-          tag: 'putData'
-        })
-      })
+      toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные добавлены'});
     })
     .catch(err => console.log(err))
 }
-const deleteSelected = (selectedBrand, selectedProducts, setProducts) => {
+const deleteSelected = (selectedBrand, selectedProducts, setProducts, toast) => {
   console.log(selectedProducts)
   axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-selected/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, { data: JSON.stringify(selectedProducts) })
     .then(response => {
       getAllFromBrand(selectedBrand, setProducts)
-      Notification.requestPermission().then(_ => {
-        const notification = new Notification('Данные удалены', {
-          tag: 'deleteData'
-        })
-      })
+      toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные удалены'});
     })
     .catch(err => console.log(err))
 }
@@ -85,15 +74,11 @@ const deleteSelected = (selectedBrand, selectedProducts, setProducts) => {
 //     })
 //     .catch(err => console.log(err))
 // }
-const updateVehicle = (selectedBrand, field, value, rowData) => {
+const updateVehicle = (selectedBrand, field, value, rowData, toast) => {
   axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, 
   JSON.stringify({field: field,value:value,rowData: rowData["VIN"]})
   ).then(response => {
-      Notification.requestPermission().then(_ => {
-        const notification = new Notification(`Данные обновлены`, {
-          tag: 'updateData'
-        })
-      })
+      toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные обновлены'});
     })
     .catch(err => console.log(err))
 }
@@ -107,6 +92,7 @@ const CarsComponent = ({ brands }) => {
   const isMounted = useRef(false)
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const toast = useRef(null)
 
   const [openAddDialog, setOpenAddDialog] = useState(false)
   const handleClickOpenAddDialog = () => {
@@ -148,7 +134,7 @@ const CarsComponent = ({ brands }) => {
       case 'year':
         if (isPositiveInteger(newValue)){
           rowData[field] = newValue;
-          updateVehicle(selectedBrand, field, newValue, rowData)
+          updateVehicle(selectedBrand, field, newValue, rowData, toast)
         }
         else
           event.preventDefault();
@@ -211,6 +197,7 @@ const CarsComponent = ({ brands }) => {
   return (
     <>
       <Stack direction='row' spacing={2} sx={{ m: 1 }}>
+        <Toast ref={toast} position="bottom-right"/>
         <Button
           aria-controls={open ? 'long-menu' : undefined}
           aria-expanded={open ? 'true' : undefined}
@@ -247,7 +234,7 @@ const CarsComponent = ({ brands }) => {
         <Button
           disabled={selectedBrand === 'Select Brand'}
           color='error'
-          onClick={() => deleteBrandColl(selectedBrand)}
+          onClick={() => deleteBrandColl(selectedBrand, toast)}
         >
           {`delete all`}
         </Button>
@@ -262,14 +249,14 @@ const CarsComponent = ({ brands }) => {
         <Button
           disabled={selectedBrand === 'Select Brand'}
           color='error'
-          onClick={() => generateRandomData(selectedBrand, generateNumRef.current.value, setProducts)}
+          onClick={() => generateRandomData(selectedBrand, generateNumRef.current.value, setProducts, toast)}
         >
           {`<- generate random`}
         </Button>
         <Button
           disabled={selectedBrand === 'Select Brand'}
           color='error'
-          onClick={() => deleteSelected(selectedBrand, selectedProducts, setProducts)}
+          onClick={() => deleteSelected(selectedBrand, selectedProducts, setProducts, toast)}
         >
           {`delete selected`}
         </Button>
