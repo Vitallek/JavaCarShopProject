@@ -105,15 +105,15 @@ const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
             spacing={2}
           >
             <TextField
-              id="standard-basic"
+              id="bren-input"
               label="Brand"
               disabled
               value={selectedBrand}
               variant="standard"
             />
             <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId="model-selection"
+              id="model-selection"
               label="Model"
               value={itemProps.model}
               onChange={(e) => setItemProps(prev => ({ ...prev, model: e.target.value }))}

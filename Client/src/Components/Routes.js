@@ -47,13 +47,13 @@ const CustomRoutes = ({}) => {
         <Grid item xs={2} sx={{ maxWidth: 250, minWidth: 216, height: '100%' }} className='navContainer'>
           <NavComponent menu={menu}/>
         </Grid>
-        <Grid container item xs={9.5} direction='column' flexWrap='nowrap'>
+        <Grid container item xs={10} direction='column' flexWrap='nowrap'>
           <Grid item xs={12} sx={{maxHeight: 50}}>
             <TopNavComponent authorized={props.auth} role={props.role}/>
           </Grid>
-          <Grid item xs={12}>
+          <Grid container item xs={12} sx={{maxHeight: '30vh'}}>
             <Routes>
-              <Route path='/' element={<HomePage />} />
+              <Route path='/' element={<HomePage brands={brands}/>} />
               <Route path='/vehicles'>
                 <Route path='/vehicles/:brand' element={<AllFromBrandComponent brands={brands}/>}/>
               </Route>
