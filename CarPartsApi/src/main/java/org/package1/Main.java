@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.json.JSONObject;
 import org.package1.utility.LoginResponse;
 import org.package1.utility.RegisterResponse;
 import org.package1.utility.User;
@@ -49,42 +50,38 @@ public class Main {
         enableCORS("http://127.0.0.1:3000", "*", null);
 //        https://www.baeldung.com/spark-framework-rest-api
         post("/register", (req, res) -> {
-            User user = gson.fromJson(req.body(), User.class);
-            String token = JWTDriver.createToken(user.email, user.password, user.role);
-            String msg = MongoDBDriver.addUserIfNotExist(user.email, user.password, user.role, token);
-            return gson.toJson(new RegisterResponse(msg, token).toString());
+            JSONObject user = new JSONObject(req.body());
+            System.out.println("register from " + user.getString("email"));
+            String token = JWTDriver.createToken(user.getString("email"), user.getString("password"), user.getString("role"));
+            return MongoDBDriver.addUserIfNotExist(user.getString("email"), user.getString("password"), user.getString("role"), token);
         });
         post("/login", (req, res) -> {
-            User user = gson.fromJson(req.body(), User.class);
-            return MongoDBDriver.manualLogin(user.email, user.password);
+            JSONObject user = new JSONObject(req.body());
+            System.out.println("login from " + user.getString("email"));
+            return MongoDBDriver.manualLogin(user.getString("email"), user.getString("password"));
         });
         post("/token-login", (req, res) -> {
             String token = req.body();
             String payload = JWTDriver.decodeToken(token);
-            User user = gson.fromJson(payload, User.class);
-            String msg = MongoDBDriver.tokenLogin(user.email, user.password);
-            return gson.toJson(new LoginResponse(msg).toString());
+            JSONObject user = new JSONObject(payload);
+            return MongoDBDriver.tokenLogin(user.getString("email"), user.getString("password"));
         });
         get("/get-all/:coll", (req, res) -> {
-            System.out.println(req.params(":coll").toLowerCase());
-            res.status(200);
-            return MongoDBDriver.getAllOfProductType(req.params(":coll").toLowerCase());
+            System.out.println("get all " + req.params(":coll").toLowerCase());
+            JSONObject response = MongoDBDriver.getAllOfProductType(req.params(":coll").toLowerCase());
+            res.status(response.getInt( "code"));
+            return response;
         });
         delete("delete-all/:coll", (req, res) -> {
-            if (MongoDBDriver.deleteAllFromColl(req.params(":coll").toLowerCase()).equals("success")) {
-                res.status(200);
-                return "success";
-            }
-            res.status(500);
-            return "error";
+            System.out.println("delete all from " + req.params(":coll"));
+            JSONObject response = MongoDBDriver.deleteAllFromColl(req.params(":coll").toLowerCase());
+            res.status(response.getInt("code"));
+            return response;
         });
         delete("delete-selected/:coll", (req, res) -> {
-            if (MongoDBDriver.deleteSelectedFromColl(req.params(":coll").toLowerCase(),req.body()).equals("success")) {
-                res.status(200);
-                return "success";
-            }
-            res.status(500);
-            return "error";
+            JSONObject response = MongoDBDriver.deleteSelectedFromColl(req.params(":coll").toLowerCase(),req.body());
+            res.status(response.getInt("code"));
+            return response;
         });
         get("random-photos/:query", (req, res) -> {
             System.out.println(req.params(":query"));
@@ -100,29 +97,31 @@ public class Main {
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
                 res.status(200);
-                return gson.toJson(response.body().string());
+                return new JSONObject().put("data", response.body().string());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new JSONObject().put("error", e.toString());
             }
         });
-        put("insert-to-coll/:brand",(req,res) -> {
-            if (MongoDBDriver.insertMany(req.params(":brand").toLowerCase(), req.body()).equals("success")) {
-                res.status(200);
-                return "success";
-            }
-            res.status(500);
-            return "error";
+        post("insert-to-coll/:brand",(req,res) -> {
+            JSONObject response = MongoDBDriver.insertMany(req.params(":brand").toLowerCase(), req.body());
+            res.status(response.getInt("code"));
+            return response;
+        });
+        post("order-vehicle",(req,res) -> {
+            JSONObject response = MongoDBDriver.orderVehicle(req.body());
+            res.status(response.getInt("code"));
+            return response;
         });
 //        post("add-brand", (req,res) -> {
-//            MongoDBDriver.addColl(req.body());
-//            res.status(200);
-//            return "success";
+//            JSONObject response =  MongoDBDriver.addColl(req.body());
+//            res.status(response.getInt("code"));
+//            return response;
 //        });
         put("update-col/:brand",(req,res) -> {
-            if (MongoDBDriver.update(req.params(":brand").toLowerCase(), req.body()).equals("success")) {
-                res.status(200);
-                return "success";
-            }
-            res.status(500);
-            return "error";
+            JSONObject response = MongoDBDriver.update(req.params(":brand").toLowerCase(), req.body());
+            res.status(response.getInt("code"));
+            return response;
         });
     }
 }

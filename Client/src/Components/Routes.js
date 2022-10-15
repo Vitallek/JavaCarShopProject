@@ -35,7 +35,7 @@ const CustomRoutes = ({}) => {
     let mounted = true
     if(!mounted) return
     axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/brands`)
-      .then(res => setBrands(res.data))
+      .then(res => setBrands(res.data.data))
       .catch(err => alert('error occured'))
     return () => mounted = false
   },[])
@@ -53,7 +53,7 @@ const CustomRoutes = ({}) => {
           <Grid item xs={12} sx={{maxHeight: 50}}>
             <TopNavComponent authorized={props.auth} role={props.role}/>
           </Grid>
-          <Grid container item xs={12} sx={{maxHeight: '30vh'}}>
+          <Grid container item xs={12} direction='column' flexWrap='nowrap'>
             <Routes>
               <Route path='/' element={<HomePage brands={brands}/>} />
               <Route path='/repair-service' element={<UnderConstructionTemplate/>} />
@@ -71,23 +71,23 @@ const CustomRoutes = ({}) => {
                   element={<AllFromBrandComponent brands={brands}/>}
                 />
                 <Route 
-                  path='/vehicles/:brand/:model/:minY' 
+                  path='/vehicles/:brand/:model/:minYear' 
                   element={<AllFromBrandComponent brands={brands}/>}
                 />
                 <Route 
-                  path='/vehicles/:brand/:model/:minY/:maxY' 
+                  path='/vehicles/:brand/:model/:minYear/:maxYear' 
                   element={<AllFromBrandComponent brands={brands}/>}
                 />
                 <Route 
-                  path='/vehicles/:brand/:model/:minY/:maxY/:minP' 
+                  path='/vehicles/:brand/:model/:minYear/:maxYear/:minPrice' 
                   element={<AllFromBrandComponent brands={brands}/>}
                 />
                 <Route 
-                  path='/vehicles/:brand/:model/:minY/:maxY/:minP/:maxP' 
+                  path='/vehicles/:brand/:model/:minYear/:maxYear/:minPrice/:maxPrice' 
                   element={<AllFromBrandComponent brands={brands}/>}
                 />
                 <Route 
-                  path='/vehicles/:brand/:model/:minY/:maxY/:minP/:maxP/:mileage' 
+                  path='/vehicles/:brand/:model/:minYear/:maxYear/:minPrice/:maxPrice/:mileage' 
                   element={<AllFromBrandComponent brands={brands}/>}
                 />
               </Route>
@@ -98,10 +98,10 @@ const CustomRoutes = ({}) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12} sx={{maxHeight: 50}}>
+      {/* <Grid item xs={12} sx={{maxHeight: 50}}>
         footer
         <FooterComponent/>
-      </Grid>
+      </Grid> */}
     </BrowserRouter>
   )
 }

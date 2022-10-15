@@ -1,14 +1,23 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import {useContext, useEffect, useState, useRef} from 'react';
+import {Card, CardActions, CardContent, CardMedia, Button, Typography} from '@mui/material';
+import {LoadingButton} from '@mui/lab';
+import { UserInfoContext } from '../../UserInfoContext';
+import { Toast } from 'primereact/toast';
 
-const MediaCard = ({element, elIndex}) => {
+const MediaCard = ({buyVehicle,element, elIndex}) => {
+  const userInfoContext = useContext(UserInfoContext)
+  const [cardStatus, setCardStatus] = useState(0)
+  const toast = useRef(null)
+  useEffect(() => {
+    if(cardStatus === 1){
+      setTimeout(() => {
+        setCardStatus(2)
+      }, 3000);
+    }
+  }, [cardStatus])
   return (
     <Card sx={{ maxWidth: 345, m:2 }}>
+      <Toast ref={toast} />
       <CardMedia
         component="img"
         height="140"
@@ -32,11 +41,34 @@ const MediaCard = ({element, elIndex}) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button onClick={() => {
-          Notification.requestPermission().then(res => {
-            return new Notification('Вы купили машину')
-          })
-        }} size="small">Купить</Button>
+        {cardStatus === 0 && 
+        <Button 
+          size="small" 
+          onClick={() => {
+            if(userInfoContext.auth === false) {
+              toast.current.show({severity:'error', summary: 'Ошибка', detail:'Пожалуйста, авторизуйтесь', life: 3000});
+              return
+            }
+            setCardStatus(1)
+            buyVehicle(element, setCardStatus)
+          }} 
+        >
+          Купить
+        </Button>}
+        {cardStatus === 1 && 
+        <LoadingButton  
+          loading
+          size="small" 
+        >
+          Купить
+        </LoadingButton >}
+        {cardStatus === 2 && 
+        <Button  
+          disabled
+          size="small" 
+        >
+          Купить
+        </Button >}
       </CardActions>
     </Card>
   );

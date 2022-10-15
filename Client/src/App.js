@@ -13,9 +13,9 @@ const App = () => {
     if(typeof Cookies.get('token') !== 'undefined'){
       let cookies = JSON.parse(Cookies.get('token'))
       axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/token-login`, cookies.token).then(response => {
-        const responseJSON = JSON.parse(response.data)
-        console.log(responseJSON)
-        setContextObject({auth: true, role: responseJSON.msg.role})
+        console.log(response.data)
+        const responseJSON = response.data
+        setContextObject({auth: true, role: responseJSON.role, email:responseJSON.email})
         // if(responseJSON.msg.code === 200) setAuthorized(true)
       })
       return

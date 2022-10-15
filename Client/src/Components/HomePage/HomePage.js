@@ -22,8 +22,7 @@ const SELECT_W_MAX_1 = '30vw'
 const SELECT_W_MAX_2 = '50vw'
 
 const handleSearch = (searchParams, navigate) => {
-  console.log(searchParams)
-  navigate(`/vehicles/${searchParams.brand.toLowerCase().replace(/ /g,'-')}/${searchParams.model}/${searchParams.minYear}/${searchParams.maxYear}/${searchParams.minPrice}/${searchParams.maxPrice}/${searchParams.mileage}`)
+  navigate(`/vehicles/${searchParams.brand}/${searchParams.model}/${searchParams.minYear}/${searchParams.maxYear}/${searchParams.minPrice}/${searchParams.maxPrice}/${searchParams.mileage}`)
 }
 const HomePage = ({ brands }) => {
   let contentItemIndex = 0
@@ -35,20 +34,19 @@ const HomePage = ({ brands }) => {
     minPrice: MIN_PRICE,
     minYear: MIN_YEAR,
     maxYear: MAX_YEAR,
-    mileage: 0
+    mileage: 300000
   })
   const navigate = useNavigate()
 
   useEffect(() => {
     let mounted = true
     if (!mounted) return
-    console.log(brands)
     // axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-content/carousel`)
     //   .then(res => setContent(res.data))
     //   .catch(err => alert('error occured'))
     axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/volvo`)
       .then(res => {
-        setContent(res.data.slice(0, 5))
+        setContent(res.data.data.slice(0, 5))
       })
       .catch(err => alert('error occured'))
     return () => mounted = false
@@ -95,7 +93,7 @@ const HomePage = ({ brands }) => {
 
   return (
     <>
-      <Grid item xs={12} sx={{ p: 1 }}>
+      <Grid item xs={12} sx={{ p: 1, maxHeight: '40vh' }}>
         <Carousel
           value={content}
           numVisible={1}
@@ -111,12 +109,12 @@ const HomePage = ({ brands }) => {
           itemTemplate={itemTemplate}
         />
       </Grid>
-      <Grid item xs={12} sx={{ p: 1 }}>
+      <Grid item xs={12} sx={{ p: 1, maxHeight: '20vh' }}>
         <Typography
           sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}
           fontSize={30}
         >
-          Давайте выберем Ваш автомобиль
+          Давайте начнём
         </Typography>
         <Stack direction='row' sx={{ p: 3, display: 'flex', justifyContent: 'center' }} spacing={2}>
           <TextField
@@ -148,13 +146,15 @@ const HomePage = ({ brands }) => {
               {brands.find(brand => brand.brand === searchParams.brand).models.map(model =>
                 <MenuItem key={model} value={model}>{model}</MenuItem>
               )}
-            </TextField>}
-
+            </TextField>
+          }
           <TextField
             id='mileage-select'
             label='Max mileage'
             variant="standard"
-            focused
+            onFocus={event => {
+              event.target.select();
+            }}
             sx={{ minWidth: SELECT_W_MIN_1, maxWidth: SELECT_W_MAX_1 }}
             value={searchParams.mileage}
             onChange={(e) => {
@@ -214,7 +214,7 @@ const HomePage = ({ brands }) => {
             />
           </Box>
           <PrimeButton
-            disabled={searchParams.brand.length === 0}
+            disabled={searchParams.brand.length === 0 || searchParams.model.length === 0}
             onClick={e => handleSearch(searchParams, navigate)}
             style={{ minWidth: SELECT_W_MIN_1, maxWidth: SELECT_W_MAX_1, fontSize: 20 }}
           >

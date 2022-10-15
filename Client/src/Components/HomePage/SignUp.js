@@ -29,12 +29,12 @@ const RegisterOnClick = (passwordInput, emailInput) => {
       role: 'user'
     }).then(response => {
       console.log(response)
-      const responseJSON = JSON.parse(response.data)
-      if (responseJSON.msg.code === 409) {
+      const responseJSON = response.data
+      if (responseJSON.code === 409) {
         alert('User already exists')
         return
       }
-      if (responseJSON.msg.code === 200) {
+      if (responseJSON.code === 200) {
         Cookies.set('token', JSON.stringify({
           token: responseJSON.token,
         }))

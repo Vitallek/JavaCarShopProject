@@ -29,7 +29,7 @@ const isPositiveInteger = (val) => {
 const getAllFromBrand = (selectedBrand, setProducts) => {
   axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/${selectedBrand.toLowerCase().replace(/ /g, '-')}`)
     .then(response => {
-      setProducts(response.data)
+      setProducts(response.data.data)
     })
     .catch(err => console.log(err))
 }
@@ -46,7 +46,7 @@ const generateRandomData = async (selectedBrand, amount, setProducts, toast) => 
     return
   }
   let data = await generateBrandData(selectedBrand, parseInt(amount))
-  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, JSON.stringify(data))
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, JSON.stringify(data))
     .then(response => {
       getAllFromBrand(selectedBrand, setProducts)
       toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные добавлены'});
@@ -256,7 +256,10 @@ const CarsComponent = ({ brands }) => {
         <Button
           disabled={selectedBrand === 'Select Brand'}
           color='error'
-          onClick={() => deleteSelected(selectedBrand, selectedProducts, setProducts, toast)}
+          onClick={() => {
+            deleteSelected(selectedBrand, selectedProducts, setProducts, toast)
+            setSelectedProducts([])
+          }}
         >
           {`delete selected`}
         </Button>

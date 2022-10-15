@@ -28,17 +28,17 @@ const LogInOnClick = (passwordInput, emailInput) => {
       email: emailInput,
       password: passwordHash,
     }).then(response => {
-      const responseJSON = JSON.parse(response.data)
+      const responseJSON = response.data
       console.log(responseJSON)
-      if (responseJSON.msg.code === 401) {
+      if (responseJSON.code === 401) {
         alert('Password incorrect')
         return
       }
-      if (responseJSON.msg.code === 409) {
+      if (responseJSON.code === 409) {
         alert('No user found')
         return
       }
-      if (responseJSON.msg.code === 200) {
+      if (responseJSON.code === 200) {
         Cookies.set('token', JSON.stringify({
           token: responseJSON.token,
         }))

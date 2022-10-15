@@ -27,14 +27,17 @@ public class MongoDBDriver {
     private static final String DB_URI = "mongodb://localhost:3002";
     public static final String DB_NAME = "Vehicles";
     public static final String USERS = "Userrrs";
-    public static String addUserIfNotExist(String email, String password, String role, String token) {
+    public static JSONObject addUserIfNotExist(String email, String password, String role, String token) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(USERS);
             //найти аккаунты с такой же почтой
             Document doc = collection.find(eq("email", email)).first();
             if (doc != null) {
-                return "{\"desc\": \"user already exists\", \"code\": 409}";
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","user already exists");
+                dataJson.put("code",409);
+                return dataJson;
             }
             try {
                 InsertOneResult result = collection.insertOne(new Document()
@@ -43,16 +46,27 @@ public class MongoDBDriver {
                         .append("password", password)
                         .append("token", token)
                         .append("role", role));
-                return "{\"desc\": \""+ result.getInsertedId().toString() +"\", \"code\": 200}";
+
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc",result.getInsertedId().toString());
+                dataJson.put("token",token);
+                dataJson.put("code",200);
+                return dataJson;
             } catch (MongoException me) {
-                return "database error";
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","database error");
+                dataJson.put("code",500);
+                return dataJson;
             }
         } catch (Exception e) {
             System.out.println(e);
-            return null;
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
-    public static String tokenLogin(String email, String password) {
+    public static JSONObject tokenLogin(String email, String password) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(USERS);
@@ -60,33 +74,64 @@ public class MongoDBDriver {
             Document doc = collection.find(eq("email", email)).first();
             if (doc != null) {
                 if(Objects.equals(doc.getString("password"), password)){
-                    return "{\"desc\": \"successful\",\"role\":\""+doc.getString("role")+"\", \"code\": 200}";
+                    JSONObject dataJson = new JSONObject();
+                    dataJson.put("desc","successful");
+                    dataJson.put("email",doc.getString("email"));
+                    dataJson.put("role",doc.getString("role"));
+                    return dataJson;
                 }
-                return "{\"desc\": \"token mismatch\", \"code\": 500}";
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","token mismatch");
+                dataJson.put("code",500);
+                return dataJson;
             }
-            return "{\"desc\": \"no user found\", \"code\": 409}";
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc","no user found");
+            dataJson.put("code",409);
+            return dataJson;
         } catch (Exception e) {
             System.out.println(e);
-            return null;
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
-    public static String manualLogin(String email, String password) {
+    public static JSONObject manualLogin(String email, String password) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(USERS);
             //найти аккаунты с такой же почтой
             Document doc = collection.find(eq("email", email)).first();
-            if(doc == null) return "{\"desc\": \"no user found\", \"code\": 409}";
-            if(!Objects.equals(doc.getString("password"), password)) return "{\"desc\": \"password incorrect\", \"code\": 401}";
+            if(doc == null) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","no user found");
+                dataJson.put("code",409);
+                return dataJson;
+            }
+            if(!Objects.equals(doc.getString("password"), password)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","password incorrect");
+                dataJson.put("code",401);
+                return dataJson;
+            }
             String token = JWTDriver.createToken(doc.getString("email"), doc.getString("password"), doc.getString("role"));
-            String msg = "{\"desc\": \"successful\",\"role\":\""+doc.getString("role")+"\", \"code\": 200}";
-            return gson.toJson(new LoginResponse(msg, token).toString());
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc","successful");
+            dataJson.put("email",doc.getString("email"));
+            dataJson.put("token",doc.getString("token"));
+            dataJson.put("role",doc.getString("role"));
+            dataJson.put("code",200);
+            return dataJson;
         } catch (Exception e) {
             System.out.println(e);
-            return null;
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
-    public static String getAllOfProductType(String coll){
+    public static JSONObject getAllOfProductType(String coll){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
@@ -96,25 +141,33 @@ public class MongoDBDriver {
             while (iterator.hasNext()) {
                 products.add(iterator.next());
             }
-            return gson.toJson(products);
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("data", products);
+            dataJson.put("code", 200);
+            return dataJson;
         } catch (Exception e) {
             System.out.println(e);
-            return "";
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
-
-    public static String deleteAllFromColl(String coll){
+    public static JSONObject deleteAllFromColl(String coll){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             collection.deleteMany(new BsonDocument());
-            return "success";
+            return new JSONObject().put("code", 200);
         } catch (Exception e) {
             System.out.println(e);
-            return e.toString();
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
-    public static String deleteSelectedFromColl(String coll, String selected){
+    public static JSONObject deleteSelectedFromColl(String coll, String selected){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
@@ -123,45 +176,73 @@ public class MongoDBDriver {
                 Bson query = eq("VIN", doc.get("VIN"));
                 collection.deleteOne(query);
             });
-            return "success";
+            return new JSONObject().put("code", 200);
         } catch (Exception e) {
             System.out.println(e);
-            return e.toString();
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
-    public static String insertMany(String coll, String data){
+    public static JSONObject insertMany(String coll, String data){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             collection.insertMany(gson.fromJson(data, new TypeToken<List<Document>>() {}.getType()));
-            return "success";
+            return new JSONObject().put("code", 200);
         } catch (Exception e) {
             System.out.println(e);
-            return e.toString();
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
-    public static String addColl(String coll){
+    public static JSONObject addColl(String coll){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             collection.createIndex(Indexes.ascending("VIN"), new IndexOptions().unique(true));
-            return "success";
+            return new JSONObject().put("code", 200);
         } catch (Exception e) {
             System.out.println(e);
-            return e.toString();
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
-    public static String update(String coll, String data){
+    public static JSONObject update(String coll, String data){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             JSONObject dataJson = new JSONObject(data);
             Document query = new Document().append("VIN",  dataJson.get("rowData"));
             collection.updateOne(query, Updates.set(dataJson.get("field").toString(),dataJson.get("value").toString()));
-            return "success";
+            return new JSONObject().put("code", 200);
         } catch (Exception e) {
             System.out.println(e);
-            return e.toString();
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
+        }
+    }
+    public static JSONObject orderVehicle(String data){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            JSONObject dataJson = new JSONObject(data);
+            System.out.println(dataJson);
+//            MongoCollection<Document> collection = database.getCollection(coll);
+//            collection.insertMany(gson.fromJson(data, new TypeToken<List<Document>>() {}.getType()));
+            return new JSONObject().put("code", 200);
+        } catch (Exception e) {
+            System.out.println(e);
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
         }
     }
 }

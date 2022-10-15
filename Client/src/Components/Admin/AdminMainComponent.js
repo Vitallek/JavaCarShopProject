@@ -20,7 +20,7 @@ const AdminMainComponent = () => {
     let mounted = true
     if (!mounted) return
     axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/brands`)
-      .then(res => setBrands(res.data))
+      .then(res => setBrands(res.data.data))
       .catch(err => alert('error occured'))
     return () => mounted = false
   }, [])

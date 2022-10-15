@@ -4,7 +4,8 @@ import {colorsRaw} from './colorsRaw'
 const getPhotos = async (query) => {
   return axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/random-photos/${query}`)
     .then(response => {
-      const data = JSON.parse(response.data)
+      console.log(response.data)
+      const data = JSON.parse(response.data.data)
       console.log(data)
       let carsModelsPhotosLinks = []
       data.results.forEach(photo => {
@@ -16,7 +17,7 @@ const getPhotos = async (query) => {
 }
 const getModels = async () => {
   return axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/brands`)
-    .then(response => response.data)
+    .then(response => response.data.data)
     .catch(err => console.log(err))
 }
 const colors = [...colorsRaw]
