@@ -16,14 +16,8 @@ import { UserInfoContext } from "../../UserInfoContext";
 const menu = [
   {
     // icon: <HomeRoundedIcon />,
-    title: 'О компании',
-    to: '/company-about',
-    items: []
-  },
-  {
-    // icon: <HomeRoundedIcon />,
     title: 'Обзоры',
-    to: '/rewiews',
+    to: '/reviews',
     items: []
   },
   {
@@ -32,18 +26,24 @@ const menu = [
     to: '/news',
     items: []
   },
-  {
-    // icon: <HomeRoundedIcon />,
-    title: 'Продать автомобиль',
-    to: '/sell-a-car',
-    items: []
-  },
+  // {
+  //   // icon: <HomeRoundedIcon />,
+  //   title: 'Продать автомобиль',
+  //   to: '/sell-a-car',
+  //   items: []
+  // },
   {
     // icon: <HomeRoundedIcon />,
     title: 'Ремонт и сервис',
     to: '/repair-service',
     items: []
   },
+  {
+    // icon: <HomeRoundedIcon />,
+    title: 'О компании',
+    to: '/company-about',
+    items: []
+  }
 ]
 const Logout = () => {
   Cookies.remove('token')

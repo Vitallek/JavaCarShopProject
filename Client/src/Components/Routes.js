@@ -9,13 +9,15 @@ import HomePage from "./HomePage/HomePage";
 import AllFromBrandComponent from "./AllProductsComponent/AllFromBrandComponent";
 import TopNavComponent from "./Navigation/TopNavComponent";
 import FooterComponent from "./Navigation/FooterComponent";
+import UnderConstructionTemplate from "./UnderConstructionTemplate/UnderConstructionTemplate";
+import AboutCompany from "./Content/AboutCompany";
 
 const processBrandsList = (brands) => {
   const menu = []
   brands.forEach(brand => {
     menu.push({
       //   icon: <HomeRoundedIcon />,
-      title: `${brand.brand} (${parseInt(Math.random() * 60)})`,
+      title: `${brand.brand} (${parseInt(Math.random() * 50) + 10})`,
       to: `/vehicles/${brand.brand.replace(/ /g,'-')}`,
       items: []
     })
@@ -54,8 +56,40 @@ const CustomRoutes = ({}) => {
           <Grid container item xs={12} sx={{maxHeight: '30vh'}}>
             <Routes>
               <Route path='/' element={<HomePage brands={brands}/>} />
+              <Route path='/repair-service' element={<UnderConstructionTemplate/>} />
+              <Route path='/reviews' element={<UnderConstructionTemplate/>} />
+              <Route path='/news' element={<UnderConstructionTemplate/>} />
+              <Route path='/company-about' element={<AboutCompany/>} />
+
               <Route path='/vehicles'>
-                <Route path='/vehicles/:brand' element={<AllFromBrandComponent brands={brands}/>}/>
+                <Route 
+                  path='/vehicles/:brand/' 
+                  element={<AllFromBrandComponent brands={brands}/>}
+                />
+                <Route 
+                  path='/vehicles/:brand/:model' 
+                  element={<AllFromBrandComponent brands={brands}/>}
+                />
+                <Route 
+                  path='/vehicles/:brand/:model/:minY' 
+                  element={<AllFromBrandComponent brands={brands}/>}
+                />
+                <Route 
+                  path='/vehicles/:brand/:model/:minY/:maxY' 
+                  element={<AllFromBrandComponent brands={brands}/>}
+                />
+                <Route 
+                  path='/vehicles/:brand/:model/:minY/:maxY/:minP' 
+                  element={<AllFromBrandComponent brands={brands}/>}
+                />
+                <Route 
+                  path='/vehicles/:brand/:model/:minY/:maxY/:minP/:maxP' 
+                  element={<AllFromBrandComponent brands={brands}/>}
+                />
+                <Route 
+                  path='/vehicles/:brand/:model/:minY/:maxY/:minP/:maxP/:mileage' 
+                  element={<AllFromBrandComponent brands={brands}/>}
+                />
               </Route>
               {props.role === 'admin' || props.role === 'head_cheater' ?
                <Route path='/adm/*' element={<ProtectedRoutes/>}/> :

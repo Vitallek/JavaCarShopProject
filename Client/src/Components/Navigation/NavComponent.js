@@ -80,6 +80,7 @@ const NavComponent = ({ menu }) => {
           onClick={() => navigate('/')}
           component="img"
           sx={{
+            cursor:'pointer',
             height: 200,
             p: 1
             // width: '100%',
