@@ -28,12 +28,12 @@ public class MongoDBDriver {
     public static final String DB_NAME = "Vehicles";
     public static final String USERS = "Userrrs";
     public static final String ORDERS = "Orders";
-    public static JSONObject addUserIfNotExist(String email, String password, String role, String token) {
+    public static JSONObject addUserIfNotExist(JSONObject user, String token) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(USERS);
             //найти аккаунты с такой же почтой
-            Document doc = collection.find(eq("email", email)).first();
+            Document doc = collection.find(eq("email", user.getString("email"))).first();
             if (doc != null) {
                 JSONObject dataJson = new JSONObject();
                 dataJson.put("desc","user already exists");
@@ -43,10 +43,12 @@ public class MongoDBDriver {
             try {
                 InsertOneResult result = collection.insertOne(new Document()
                         .append("_id", new ObjectId())
-                        .append("email", email)
-                        .append("password", password)
+                        .append("email", user.getString("email"))
+                        .append("phone", user.getString("phone"))
+                        .append("name", user.getString("name"))
+                        .append("password", user.getString("password"))
                         .append("token", token)
-                        .append("role", role));
+                        .append("role", user.getString("role")));
 
                 JSONObject dataJson = new JSONObject();
                 dataJson.put("desc",result.getInsertedId().toString());
@@ -78,6 +80,8 @@ public class MongoDBDriver {
                     JSONObject dataJson = new JSONObject();
                     dataJson.put("desc","successful");
                     dataJson.put("email",doc.getString("email"));
+                    dataJson.put("phone",doc.getString("phone"));
+                    dataJson.put("name",doc.getString("name"));
                     dataJson.put("role",doc.getString("role"));
                     return dataJson;
                 }
@@ -116,10 +120,12 @@ public class MongoDBDriver {
                 dataJson.put("code",401);
                 return dataJson;
             }
-            String token = JWTDriver.createToken(doc.getString("email"), doc.getString("password"), doc.getString("role"));
+            String token = JWTDriver.createToken(new JSONObject(doc));
             JSONObject dataJson = new JSONObject();
             dataJson.put("desc","successful");
             dataJson.put("email",doc.getString("email"));
+            dataJson.put("phone",doc.getString("phone"));
+            dataJson.put("name",doc.getString("name"));
             dataJson.put("token",doc.getString("token"));
             dataJson.put("role",doc.getString("role"));
             dataJson.put("code",200);
@@ -317,7 +323,7 @@ public class MongoDBDriver {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(ORDERS);
-            FindIterable<Document> findIterable = collection.find(eq("user", email));
+            FindIterable<Document> findIterable = collection.find(eq("user_email", email));
             Iterator<Document> iterator = findIterable.iterator();
             ArrayList<Document> orders = new ArrayList<>();
             while (iterator.hasNext()) {

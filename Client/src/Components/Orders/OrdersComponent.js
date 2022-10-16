@@ -9,14 +9,15 @@ import { Button as PrimeButton } from 'primereact/button'
 let cancelTimeout
 const cancelOrder = (element, email) => {
   delete element._id
-  delete element.user
+  delete element.user_email
+  delete element.user_phone
   axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/cancel-order/`, {vehicle:element, user:email})
     .then(response => {
       console.log(response)
     })
     .catch(err => console.log(err))
 }
-const OrdersComponent = ({ brands, email }) => {
+const OrdersComponent = ({ brands, user }) => {
   const [content, setContent] = useState([])
   const userInfoContext = useContext(UserInfoContext)
   const toast = useRef(null)
@@ -24,9 +25,9 @@ const OrdersComponent = ({ brands, email }) => {
   useEffect(() => {
     let mounted = true
     if (!mounted) return
-    console.log(email)
-    if (email === undefined) return
-    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-orders/${email}`)
+    console.log(user.email)
+    if (user.email === undefined) return
+    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-orders/${user.email}`)
       .then(response => {
         console.log(response.data)
         if (response.data.data.length === 0) return
@@ -34,7 +35,7 @@ const OrdersComponent = ({ brands, email }) => {
       })
       .catch(err => console.log(err))
     return () => mounted = false
-  }, [email])
+  }, [user.email])
 
   return (
     <Grid item xs={12} sx={{ maxHeight: '80vh', overflowY: 'scroll' }}>

@@ -70,7 +70,7 @@ const SignIn = () => {
             required
             fullWidth
             inputRef={emailInput}
-            label="Имя"
+            label="Почта"
             name="username"
             autoFocus
           />

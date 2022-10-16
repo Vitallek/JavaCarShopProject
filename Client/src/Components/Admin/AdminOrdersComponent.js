@@ -146,14 +146,15 @@ const AdminOrdersComponent = ({ brands }) => {
         <Column field="brand" header="Brand" filter sortable />
         <Column field="model" header="Model" filter sortable />
         <Column field="VIN" header="VIN" filter sortable />
-        <Column field="user" header="Email" filter sortable />
+        <Column field="user_email" header="Email" filter sortable />
+        <Column field="user_phone" header="Phone" filter sortable />
         <Column field="status" header="Status" filter sortable body={row => {
           switch (row.status) {
-            case 0:
-              return 'Новый'
             case 1:
-              return 'В обработке'
+              return 'Новый'
             case 2:
+              return 'В обработке'
+            case 3:
               return 'Можно забирать'
             default:
               return 'Ошибка';

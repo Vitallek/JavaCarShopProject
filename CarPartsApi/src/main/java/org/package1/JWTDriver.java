@@ -2,21 +2,22 @@ package org.package1;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.json.JSONObject;
 
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 
 public class JWTDriver {
-    public static String createToken(String email, String password, String role){
+    public static String createToken(JSONObject user){
         String jwtToken = Jwts.builder()
-                .claim("email", email)
-                .claim("password", password)
-                .claim("role", role)
-                .setSubject(email)
+                .claim("email", user.getString("email"))
+                .claim("password", user.getString("password"))
+                .claim("role", user.getString("role"))
+                .setSubject(user.getString("email"))
                 .setIssuedAt(Date.from(Instant.now()))
 //                .setExpiration(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))
-                .signWith(SignatureAlgorithm.HS256, email + password)
+                .signWith(SignatureAlgorithm.HS256, user.getString("email") + user.getString("password"))
                 .compact();
         return jwtToken;
     }

@@ -61,7 +61,7 @@ const CustomRoutes = ({}) => {
               <Route path='/reviews' element={<UnderConstructionTemplate/>} />
               <Route path='/news' element={<UnderConstructionTemplate/>} />
               <Route path='/company-about' element={<AboutCompany/>} />
-              <Route path='/orders' element={<OrdersComponent brands={brands} email={props.email}/>} />
+              <Route path='/orders' element={<OrdersComponent brands={brands} user={props}/>} />
 
               <Route path='/vehicles'>
                 <Route 

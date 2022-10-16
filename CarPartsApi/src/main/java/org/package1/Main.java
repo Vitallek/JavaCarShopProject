@@ -48,12 +48,11 @@ public class Main {
         System.out.println("server started at port " + port);
         port(port);
         enableCORS("http://127.0.0.1:3000", "*", null);
-//        https://www.baeldung.com/spark-framework-rest-api
         post("/register", (req, res) -> {
             JSONObject user = new JSONObject(req.body());
             System.out.println("register from " + user.getString("email"));
-            String token = JWTDriver.createToken(user.getString("email"), user.getString("password"), user.getString("role"));
-            return MongoDBDriver.addUserIfNotExist(user.getString("email"), user.getString("password"), user.getString("role"), token);
+            String token = JWTDriver.createToken(user);
+            return MongoDBDriver.addUserIfNotExist(user, token);
         });
         post("/login", (req, res) -> {
             JSONObject user = new JSONObject(req.body());

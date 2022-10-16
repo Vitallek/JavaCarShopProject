@@ -1,31 +1,34 @@
-import React, {useRef } from 'react';
-import { Register } from '../Utility/LoginAndRegister';
+import React, { useRef } from 'react';
 import Cookies from 'js-cookie';
 import { sha256 } from 'crypto-hash';
 import axios from 'axios';
-import jwt_decode from 'jwt-decode'
-
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
+import { Toast } from 'primereact/toast';
+import { Container } from '@mui/system';
 
 const enterKey = 13
-const handleEnterPush = (e, passwordInput, emailInput) => {
-  if(e.keyCode === enterKey) RegisterOnClick(passwordInput, emailInput)
+const handleEnterPush = (e, passwordInput, emailInput, phoneInput, nameInput, toast) => {
+  if (e.keyCode === enterKey) RegisterOnClick(passwordInput, emailInput, phoneInput, nameInput, toast)
 }
 
-const RegisterOnClick = (passwordInput, emailInput) => {
+const RegisterOnClick = (passwordInput, emailInput, phoneInput, nameInput, toast) => {
+  if(passwordInput.length === 0 ||
+    emailInput.length === 0 ||
+    phoneInput.length === 0 ||
+    nameInput.length === 0) {
+      toast.current.show({ severity: 'error', summary: 'Ошибка', detail: 'Остались пустые поля' })
+      return
+    }
   sha256(passwordInput, process.env.REACT_APP_PASSWORD_SALT).then(hash => {
     let passwordHash = hash
     axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/register`, {
       email: emailInput,
       password: passwordHash,
+      phone: phoneInput,
+      name: nameInput,
       role: 'user'
     }).then(response => {
       console.log(response)
@@ -47,10 +50,13 @@ const RegisterOnClick = (passwordInput, emailInput) => {
 const SignUp = ({ switchForm }) => {
   const emailInput = useRef(null)
   const passwordInput = useRef(null)
-
+  const phoneInput = useRef(null)
+  const nameInput = useRef(null)
+  const toast = useRef(null)
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
+      <Toast ref={toast} position="bottom-right"/>
       <Box
         sx={{
           marginTop: 8,
@@ -61,18 +67,21 @@ const SignUp = ({ switchForm }) => {
       >
         <Box component="form" noValidate sx={{ mt: 1 }}>
           <TextField
-            onKeyDown={(e) => {handleEnterPush(e, passwordInput.current.value, emailInput.current.value)}}
+            onKeyDown={(e) => {
+              handleEnterPush(e, passwordInput.current.value, emailInput.current.value, phoneInput.current.value, nameInput.current.value, toast)
+            }}
             margin="normal"
             required
             fullWidth
             inputRef={emailInput}
-            label="Имя"
-            name="username"
+            label="Почта"
+            name="email"
             autoFocus
           />
           <TextField
-            onKeyDown={(e) => {handleEnterPush(e, passwordInput.current.value, emailInput.current.value)}}
-            margin="normal"
+            onKeyDown={(e) => {
+              handleEnterPush(e, passwordInput.current.value, emailInput.current.value, phoneInput.current.value, nameInput.current.value, toast)
+            }} margin="normal"
             required
             fullWidth
             inputRef={passwordInput}
@@ -80,13 +89,37 @@ const SignUp = ({ switchForm }) => {
             name="password"
             type="password"
           />
-          {/* <FormControlLabel
-                  control={<Checkbox value="remember" color="primary" />}
-                  label="Запомнить меня"
-                /> */}
-
+          <TextField
+            onKeyDown={(e) => {
+              handleEnterPush(e, passwordInput.current.value, emailInput.current.value, phoneInput.current.value, nameInput.current.value, toast)
+            }} margin="normal"
+            required
+            fullWidth
+            inputRef={nameInput}
+            label="Имя"
+            name="name"
+            type="name"
+          />
+          <TextField
+            onKeyDown={(e) => {
+              handleEnterPush(e, passwordInput.current.value, emailInput.current.value, phoneInput.current.value, nameInput.current.value, toast)
+            }} margin="normal"
+            required
+            fullWidth
+            inputRef={phoneInput}
+            label="Телефон"
+            name="phone"
+            type="phone"
+          />
           <Button
-            onClick={(e) => {RegisterOnClick(passwordInput.current.value, emailInput.current.value)}}
+            onClick={(e) => { 
+              RegisterOnClick(
+                passwordInput.current.value, 
+                emailInput.current.value, 
+                phoneInput.current.value, 
+                nameInput.current.value,
+                toast) 
+            }}
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}

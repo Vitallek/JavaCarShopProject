@@ -6,8 +6,9 @@ import { Toast } from 'primereact/toast';
 import { Button as PrimeButton } from 'primereact/button'
 import axios from 'axios'
 let buyTimeout
-const processOrder = (element,email) => {
-  element.user = email
+const processOrder = (element,userInfoContext) => {
+  element.user_email = userInfoContext.email
+  element.user_phone = userInfoContext.phone
   delete element._id
   axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/order-vehicle/`, element)
     .then(response => {
@@ -93,7 +94,7 @@ const MediaCard = ({ element, elIndex }) => {
 
               buyTimeout = setTimeout(() => {
                 setCardStatus(2)
-                processOrder(element, userInfoContext.email)
+                processOrder(element, userInfoContext)
                 toast.current.show({severity:'success', summary: 'Заказ создан', life: 3000});
               }, 5000)
             }}

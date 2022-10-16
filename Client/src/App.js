@@ -15,7 +15,13 @@ const App = () => {
       axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/token-login`, cookies.token).then(response => {
         console.log(response.data)
         const responseJSON = response.data
-        setContextObject({auth: true, role: responseJSON.role, email:responseJSON.email})
+        setContextObject({
+          auth: true, 
+          role: responseJSON.role, 
+          email:responseJSON.email, 
+          name:responseJSON.name,
+          phone: responseJSON.phone
+        })
         // if(responseJSON.msg.code === 200) setAuthorized(true)
       })
       return
