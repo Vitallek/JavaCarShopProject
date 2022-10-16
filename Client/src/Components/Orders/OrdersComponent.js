@@ -160,6 +160,14 @@ const MediaCard = ({ element, elIndex }) => {
           >
             Можно забирать
           </Button>}
+        {cardStatus === 4 &&
+        <Button
+          size="small"
+          variant='contained'
+          color='secondary'
+        >
+          Выполнен
+        </Button>}
       </CardActions>
     </Card>
   );

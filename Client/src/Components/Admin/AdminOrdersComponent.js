@@ -88,7 +88,8 @@ const AdminOrdersComponent = ({ brands }) => {
   const statuses = [
     { label: 'Новый', value: 1 },
     { label: 'В обработке', value: 2 },
-    { label: 'Можно забирать', value: 3 }
+    { label: 'Можно забирать', value: 3 },
+    { label: 'Выполнен', value: 4 }
   ]
 
   const statusEditor = (options) => {
@@ -156,6 +157,8 @@ const AdminOrdersComponent = ({ brands }) => {
               return 'В обработке'
             case 3:
               return 'Можно забирать'
+            case 4:
+              return 'Выполнен'
             default:
               return 'Ошибка';
           }
