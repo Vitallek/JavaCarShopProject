@@ -11,6 +11,7 @@ import TopNavComponent from "./Navigation/TopNavComponent";
 import FooterComponent from "./Navigation/FooterComponent";
 import UnderConstructionTemplate from "./UnderConstructionTemplate/UnderConstructionTemplate";
 import AboutCompany from "./Content/AboutCompany";
+import OrdersComponent from "./Orders/OrdersComponent";
 
 const processBrandsList = (brands) => {
   const menu = []
@@ -60,6 +61,7 @@ const CustomRoutes = ({}) => {
               <Route path='/reviews' element={<UnderConstructionTemplate/>} />
               <Route path='/news' element={<UnderConstructionTemplate/>} />
               <Route path='/company-about' element={<AboutCompany/>} />
+              <Route path='/orders' element={<OrdersComponent brands={brands} email={props.email}/>} />
 
               <Route path='/vehicles'>
                 <Route 

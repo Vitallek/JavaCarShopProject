@@ -72,6 +72,12 @@ public class Main {
             res.status(response.getInt( "code"));
             return response;
         });
+        get("/get-orders/:email", (req, res) -> {
+            System.out.println("get orders from " + req.params(":email"));
+            JSONObject response = MongoDBDriver.getUserOrders(req.params(":email").toLowerCase());
+            res.status(response.getInt( "code"));
+            return response;
+        });
         delete("delete-all/:coll", (req, res) -> {
             System.out.println("delete all from " + req.params(":coll"));
             JSONObject response = MongoDBDriver.deleteAllFromColl(req.params(":coll").toLowerCase());
@@ -108,8 +114,15 @@ public class Main {
             res.status(response.getInt("code"));
             return response;
         });
-        post("order-vehicle",(req,res) -> {
+        post("order-vehicle/",(req,res) -> {
+            System.out.println(req.body());
             JSONObject response = MongoDBDriver.orderVehicle(req.body());
+            res.status(response.getInt("code"));
+            return response;
+        });
+        post("cancel-order/",(req,res) -> {
+            System.out.println(req.body());
+            JSONObject response = MongoDBDriver.cancelOrder(req.body());
             res.status(response.getInt("code"));
             return response;
         });

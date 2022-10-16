@@ -11,7 +11,6 @@ import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import '@fontsource/roboto/400.css';
 import SignInDialog from "../HomePage/SignInDialog";
 import Cookies from "js-cookie";
-import { UserInfoContext } from "../../UserInfoContext";
 
 const menu = [
   {
@@ -132,12 +131,15 @@ const TopNavComponent = ({ authorized, role }) => {
             Избранное
           </ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => {alert('todo')}}>
+        <MenuItem onClick={() => {
+          handleCloseMenu(setAnchorEl)
+          navigate('/orders')
+        }}>
           <ListItemIcon>
             <DirectionsCarRoundedIcon />
           </ListItemIcon>
           <ListItemText>
-            Ваши автомобили
+            Мои заказы
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={Logout}>

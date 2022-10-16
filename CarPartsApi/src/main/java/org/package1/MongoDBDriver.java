@@ -27,6 +27,7 @@ public class MongoDBDriver {
     private static final String DB_URI = "mongodb://localhost:3002";
     public static final String DB_NAME = "Vehicles";
     public static final String USERS = "Userrrs";
+    public static final String ORDERS = "Orders";
     public static JSONObject addUserIfNotExist(String email, String password, String role, String token) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
@@ -233,10 +234,65 @@ public class MongoDBDriver {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             JSONObject dataJson = new JSONObject(data);
-            System.out.println(dataJson);
-//            MongoCollection<Document> collection = database.getCollection(coll);
+            MongoCollection<Document> vehicleCollection = database.getCollection(
+                    dataJson.getString("brand").toLowerCase().replaceAll("\\s","-"));
+
+            MongoCollection<Document> ordersCollection = database.getCollection(ORDERS);
+            ordersCollection.createIndex(Indexes.ascending("VIN"), new IndexOptions().unique(true));
+            ordersCollection.createIndex(Indexes.ascending("user"));
+
+            vehicleCollection.deleteOne(eq("VIN", dataJson.getString("VIN")));
+            dataJson.put("status", 1);
+            ordersCollection.insertOne(Document.parse(dataJson.toString()));
 //            collection.insertMany(gson.fromJson(data, new TypeToken<List<Document>>() {}.getType()));
             return new JSONObject().put("code", 200);
+        } catch (Exception e) {
+            System.out.println(e);
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
+        }
+    }
+    public static JSONObject cancelOrder(String data){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            JSONObject dataJson = new JSONObject(data);
+            JSONObject vehicle = dataJson.getJSONObject("vehicle");
+            String email = dataJson.getString("user");
+
+            MongoCollection<Document> vehicleCollection = database.getCollection(
+                    vehicle.getString("brand").toLowerCase().replaceAll("\\s","-"));
+
+            MongoCollection<Document> ordersCollection = database.getCollection(ORDERS);
+
+            ordersCollection.deleteOne(eq("VIN", vehicle.getString("VIN")));
+            vehicle.put("status", 0);
+            vehicleCollection.insertOne(Document.parse(vehicle.toString()));
+//            collection.insertMany(gson.fromJson(data, new TypeToken<List<Document>>() {}.getType()));
+            return new JSONObject().put("code", 200);
+        } catch (Exception e) {
+            System.out.println(e);
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
+        }
+    }
+    public static JSONObject getUserOrders(String email){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(ORDERS);
+            FindIterable<Document> findIterable = collection.find(eq("user", email));
+            Iterator<Document> iterator = findIterable.iterator();
+            ArrayList<Document> orders = new ArrayList<>();
+            while (iterator.hasNext()) {
+                orders.add(iterator.next());
+            }
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("data", orders);
+            dataJson.put("code", 200);
+            return dataJson;
         } catch (Exception e) {
             System.out.println(e);
             JSONObject dataJson = new JSONObject();

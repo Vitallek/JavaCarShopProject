@@ -1,5 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
-import Cookies from 'js-cookie';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Grid, Button, Link, Stack, Typography, TextField, MenuItem, IconButton } from '@mui/material';
 import { Slider } from 'primereact/slider';
@@ -8,7 +7,6 @@ import axios from 'axios';
 import MediaCard from './ProductCardComponent';
 import { Button as PrimeButton } from 'primereact/button'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { UserInfoContext } from '../../UserInfoContext';
 
 const MIN_YEAR = 2000
 const MIN_PRICE = 0
@@ -24,19 +22,14 @@ const AllFromBrandComponent = ({brands}) => {
   const [content, setContent] = useState([])
   const [filteredContent, setFilteredContent] = useState([])
   const [searchParams, setSearchParams] = useState({
-    brand: ''
+    brand: '',
+    model: '',
+    maxPrice: MAX_PRICE,
+    minPrice: MIN_PRICE,
+    minYear: MIN_YEAR,
+    maxYear: MAX_YEAR,
+    mileage: 300000
   })
-  const userInfoContext = useContext(UserInfoContext)
-  const buyVehicle = (element) => {
-    console.log({
-      vehicle: element,
-      user: userInfoContext
-    })
-    // axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/order-vehicle/`,{
-    //   vehicle: element,
-    //   user: userInfoContext
-    // })
-  }
   //render component
   useEffect(() => {
     let mounted = true
@@ -68,24 +61,27 @@ const AllFromBrandComponent = ({brands}) => {
 
   const filterVehicles = () => {
     console.log(searchParams)
-    setFilteredContent(content.filter(el => 
-      // if(searchParams.model === '') return (
-      //   el.price >= searchParams.minPrice &&
-      //   el.price <= searchParams.maxPrice &&
-      //   el.year >= searchParams.minYear &&
-      //   el.year <= searchParams.maxyear &&
-      //   el.mileage <= searchParams.mileage
-      // )
-     
-        el.price >= searchParams.minPrice &&
-        el.price <= searchParams.maxPrice &&
-        el.year >= searchParams.minYear &&
-        el.year <= searchParams.maxYear &&
-        el.mileage <= searchParams.mileage
-      
-    ))
+    setFilteredContent(content.filter(el => {
+      if(searchParams.model === ''){
+        return (
+          el.price >= searchParams.minPrice &&
+          el.price <= searchParams.maxPrice &&
+          el.year >= searchParams.minYear &&
+          el.year <= searchParams.maxYear &&
+          el.mileage <= searchParams.mileage
+        )
+      } else {
+        return (
+          el.model === searchParams.model &&
+          el.price >= searchParams.minPrice &&
+          el.price <= searchParams.maxPrice &&
+          el.year >= searchParams.minYear &&
+          el.year <= searchParams.maxYear &&
+          el.mileage <= searchParams.mileage
+        )
+      }
+    }))
   }
-
   return (
     <>
       <Grid item xs={12} sx={{ p: 1, maxHeight:'20vh' }}>
@@ -222,7 +218,13 @@ const AllFromBrandComponent = ({brands}) => {
       </Grid>
       <Grid item xs={12} sx={{maxHeight: '80vh',overflowY:'scroll'}}>
         <Stack direction="row" sx={{ p: 1, justifyContent:'center',flexWrap: 'wrap' }}>
-          {filteredContent.map((element, elIndex) => <MediaCard buyVehicle={buyVehicle} key={elIndex} element={element} elIndex={elIndex} />)}
+          {filteredContent.map((element, elIndex) => 
+          <MediaCard 
+            key={elIndex} 
+            element={element} 
+            elIndex={elIndex} 
+          />
+          )}
         </Stack>
       </Grid>
     </>
