@@ -8,6 +8,7 @@ import { useEffect, useState, useContext } from 'react';
 import { UserInfoContext } from '../../UserInfoContext';
 import CarsComponent from './CarsComponent';
 import DeployDays from './DeployDays';
+import AdminOrdersComponent from './AdminOrdersComponent';
 
 const AdminMainComponent = () => {
   const props = useContext(UserInfoContext)
@@ -35,19 +36,18 @@ const AdminMainComponent = () => {
           textColor="inherit"
           indicatorColor="string"
         >
-          <Tab label="Модерация" />
+          <Tab label="Заказы" />
           <Tab label="Авто" />
-          <Tab label="Контент" />
+          {/* <Tab label="Контент" /> */}
           <Tab label="Пользователи" />
           <Tab color='error' label="Памятка разработчику!" icon={
             <Tooltip title="Важно!">
               <WarningRoundedIcon color='error'/>
             </Tooltip> }/>
         </Tabs>
-        {/* {activeTab === 0 && <WbCombinedTable
-          combinedData={combinedData}
-          wbStocks={wbStocks}
-        />} */}
+        {activeTab === 0 && <AdminOrdersComponent
+          brands={brands}
+        />}
         {activeTab === 1 && <CarsComponent
           brands={brands}
         />}

@@ -75,8 +75,12 @@ const deleteSelected = (selectedBrand, selectedProducts, setProducts, toast) => 
 //     .catch(err => console.log(err))
 // }
 const updateVehicle = (selectedBrand, field, value, rowData, toast) => {
-  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, 
-  JSON.stringify({field: field,value:value,rowData: rowData["VIN"]})
+  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/`, 
+  JSON.stringify({
+    coll: selectedBrand.toLowerCase().replace(/ /g, '-'), 
+    field: field,
+    value:value, 'VIN': rowData["VIN"]
+  })
   ).then(response => {
       toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные обновлены'});
     })
@@ -134,16 +138,19 @@ const CarsComponent = ({ brands }) => {
       case 'year':
         if (isPositiveInteger(newValue)){
           rowData[field] = newValue;
-          updateVehicle(selectedBrand, field, newValue, rowData, toast)
+          updateVehicle(selectedBrand, field, parseInt(newValue), rowData, toast)
         }
         else
           event.preventDefault();
         break;
       case 'images':
+        alert('todo')
         break;
       default:
-        if (newValue.trim().length > 0)
+        if (newValue.trim().length > 0) {
           rowData[field] = newValue;
+          updateVehicle(selectedBrand, field, newValue, rowData, toast)
+        }
         else
           event.preventDefault();
         break;

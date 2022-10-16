@@ -72,6 +72,12 @@ public class Main {
             res.status(response.getInt( "code"));
             return response;
         });
+        get("/get-all-orders", (req, res) -> {
+            System.out.println("get all orders");
+            JSONObject response = MongoDBDriver.getAllOrders();
+            res.status(response.getInt( "code"));
+            return response;
+        });
         get("/get-orders/:email", (req, res) -> {
             System.out.println("get orders from " + req.params(":email"));
             JSONObject response = MongoDBDriver.getUserOrders(req.params(":email").toLowerCase());
@@ -131,8 +137,8 @@ public class Main {
 //            res.status(response.getInt("code"));
 //            return response;
 //        });
-        put("update-col/:brand",(req,res) -> {
-            JSONObject response = MongoDBDriver.update(req.params(":brand").toLowerCase(), req.body());
+        put("update-col/",(req,res) -> {
+            JSONObject response = MongoDBDriver.update(req.body());
             res.status(response.getInt("code"));
             return response;
         });

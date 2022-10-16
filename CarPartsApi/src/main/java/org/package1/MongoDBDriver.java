@@ -154,6 +154,28 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
+    public static JSONObject getAllOrders(){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(ORDERS);
+            FindIterable<Document> findIterable = collection.find();
+            Iterator<Document> iterator = findIterable.iterator();
+            ArrayList<Document> products = new ArrayList<>();
+            while (iterator.hasNext()) {
+                products.add(iterator.next());
+            }
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("data", products);
+            dataJson.put("code", 200);
+            return dataJson;
+        } catch (Exception e) {
+            System.out.println(e);
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
+        }
+    }
     public static JSONObject deleteAllFromColl(String coll){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
@@ -214,13 +236,25 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject update(String coll, String data){
+    public static JSONObject update(String data){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            JSONObject dataJson = new JSONObject(data);
+            String coll = dataJson.getString("coll");
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
-            JSONObject dataJson = new JSONObject(data);
-            Document query = new Document().append("VIN",  dataJson.get("rowData"));
-            collection.updateOne(query, Updates.set(dataJson.get("field").toString(),dataJson.get("value").toString()));
+            System.out.println(coll);
+            if(dataJson.get("value") instanceof String){
+                System.out.println(collection.updateOne(
+                        eq("VIN", dataJson.getString("VIN")),
+                        Updates.set(dataJson.getString("field"),dataJson.getString("value"))
+                ));
+            }
+            if(dataJson.get("value") instanceof Integer){
+                System.out.println(collection.updateOne(
+                        eq("VIN", dataJson.getString("VIN")),
+                        Updates.set(dataJson.getString("field"),dataJson.getInt("value"))
+                ));
+            }
             return new JSONObject().put("code", 200);
         } catch (Exception e) {
             System.out.println(e);
