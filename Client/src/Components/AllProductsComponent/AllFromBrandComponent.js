@@ -34,7 +34,9 @@ const AllFromBrandComponent = ({brands}) => {
   useEffect(() => {
     let mounted = true
     if (!mounted) return
-    console.log(brands)
+
+    if (pageParams.brand.length === 0) return
+    console.log(pageParams)
     let newSearchParams = {...pageParams}
     if (newSearchParams.model === undefined) newSearchParams.model = ''
     if (newSearchParams.maxPrice === undefined) newSearchParams.maxPrice = MAX_PRICE
@@ -43,8 +45,6 @@ const AllFromBrandComponent = ({brands}) => {
     if (newSearchParams.maxYear === undefined) newSearchParams.maxYear = MAX_YEAR
     if (newSearchParams.mileage === undefined) newSearchParams.mileage = 300000
     setSearchParams(newSearchParams)
-
-    if (pageParams.brand.length === 0) return
     axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/${pageParams.brand.replace(/ /g,'-').toLowerCase()}`)
       .then(response => {
         console.log(response.data)
@@ -56,11 +56,17 @@ const AllFromBrandComponent = ({brands}) => {
   }, [pageParams])
 
   useEffect(() => {
-    setFilteredContent(content)
+    if(content.length === 0) return
+    filterVehicles(content, searchParams)
   }, [content])
 
-  const filterVehicles = () => {
+  const filterVehicles = (content,searchParams) => {
+    console.log(brands)
     console.log(searchParams)
+    if(searchParams.brand.length === 0) {
+      setFilteredContent(content)
+      return
+    }
     setFilteredContent(content.filter(el => {
       if(searchParams.model === ''){
         return (
@@ -88,12 +94,12 @@ const AllFromBrandComponent = ({brands}) => {
         <Stack direction='row' sx={{ p: 3, display: 'flex', justifyContent: 'center' }} spacing={2}>
           <TextField
             label='Brand...'
-            value={searchParams.brand}
+            value={searchParams.brand.replace(/-/g,' ')}
             disabled
             sx={{ minWidth: SELECT_W_MIN_1, maxWidth: SELECT_W_MAX_1 }}
           />
           
-          {brands.find(brand => brand.brand === searchParams.brand) === undefined
+          {brands.find(brand => brand.brand.toLowerCase() === searchParams.brand.replace(/-/g,' ').toLowerCase()) === undefined
             ?
             <TextField
               label="Model"
@@ -109,7 +115,7 @@ const AllFromBrandComponent = ({brands}) => {
               sx={{ minWidth: SELECT_W_MIN_1, maxWidth: SELECT_W_MAX_1 }}
               onChange={(e) => setSearchParams(prev => ({ ...prev, model: e.target.value }))}
             >
-              {brands.find(brand => brand.brand === searchParams.brand).models.map(model =>
+              {brands.find(brand => brand.brand.toLowerCase() === searchParams.brand.replace(/-/g,' ').toLowerCase()).models.map(model =>
                 <MenuItem key={model} value={model}>{model}</MenuItem>
               )}
             </TextField>
@@ -209,7 +215,7 @@ const AllFromBrandComponent = ({brands}) => {
             <DeleteForeverIcon />
           </IconButton>
           <PrimeButton
-            onClick={filterVehicles}
+            onClick={() => filterVehicles(content, searchParams)}
             style={{ minWidth: SELECT_W_MIN_1, maxWidth: SELECT_W_MAX_1, fontSize: 20 }}
           >
             Поиск

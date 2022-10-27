@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { LogIn } from '../Utility/LoginAndRegister';
 import Cookies from 'js-cookie'
 
 import Avatar from '@mui/material/Avatar';

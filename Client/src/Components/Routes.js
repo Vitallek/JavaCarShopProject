@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import { BrowserRouter, Routes, Route, useRoutes, Outlet } from "react-router-dom";
 import axios from 'axios';
 import { Grid } from "@mui/material";
@@ -12,6 +12,7 @@ import FooterComponent from "./Navigation/FooterComponent";
 import UnderConstructionTemplate from "./UnderConstructionTemplate/UnderConstructionTemplate";
 import AboutCompany from "./Content/AboutCompany";
 import OrdersComponent from "./Orders/OrdersComponent";
+import {brandsMock} from './Utility/brandsMock'
 
 const processBrandsList = (brands) => {
   const menu = []
@@ -30,20 +31,25 @@ const CustomRoutes = ({}) => {
   const props = useContext(UserInfoContext)
 
   const [menu, setMenu] = useState(['Empty'])
-  const [brands, setBrands] = useState([])
+  const [brands, setBrands] = useState(brandsMock)
 
   useEffect(() => {
     let mounted = true
     if(!mounted) return
     axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/brands`)
       .then(res => setBrands(res.data.data))
-      .catch(err => alert('error occured'))
+      .catch(err => {
+        setBrands(brandsMock)
+        alert('error occured')
+      })
     return () => mounted = false
   },[])
 
+  const brandsMemoized = useMemo(() => processBrandsList(brands),[brands])
   useEffect(() => {
     setMenu(processBrandsList(brands))
   }, [brands])
+  
   return (
     <BrowserRouter>
       <Grid container flexWrap='nowrap'>
