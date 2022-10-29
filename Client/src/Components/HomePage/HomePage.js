@@ -44,7 +44,7 @@ const HomePage = ({ brands }) => {
     // axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-content/carousel`)
     //   .then(res => setContent(res.data))
     //   .catch(err => alert('error occured'))
-    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/volvo`)
+    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/mercedes-benz`)
       .then(res => {
         setContent(res.data.data.slice(0, 5))
       })
@@ -75,6 +75,7 @@ const HomePage = ({ brands }) => {
             variant='contained'
             color='secondary'
             sx={{ maxWidth: 200 }}
+            onClick={() => navigate('vehicles/Mercedes-Benz')}
           >
             Перейти
           </Button>
