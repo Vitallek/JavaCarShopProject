@@ -13,12 +13,9 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
-import org.package1.utility.LoginResponse;
+import org.package1.utility.User;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -28,12 +25,13 @@ public class MongoDBDriver {
     public static final String DB_NAME = "Vehicles";
     public static final String USERS = "Userrrs";
     public static final String ORDERS = "Orders";
-    public static JSONObject addUserIfNotExist(JSONObject user, String token) {
+    public static final String BRANDS = "Brands";
+    public static JSONObject addUserIfNotExist(User user) {
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(USERS);
             //найти аккаунты с такой же почтой
-            Document doc = collection.find(eq("email", user.getString("email"))).first();
+            Document doc = collection.find(eq("email", user.getEmail())).first();
             if (doc != null) {
                 JSONObject dataJson = new JSONObject();
                 dataJson.put("desc","user already exists");
@@ -43,16 +41,16 @@ public class MongoDBDriver {
             try {
                 InsertOneResult result = collection.insertOne(new Document()
                         .append("_id", new ObjectId())
-                        .append("email", user.getString("email"))
-                        .append("phone", user.getString("phone"))
-                        .append("name", user.getString("name"))
-                        .append("password", user.getString("password"))
-                        .append("token", token)
-                        .append("role", user.getString("role")));
+                        .append("email", user.getEmail())
+                        .append("phone", user.getPhone())
+                        .append("name", user.getName())
+                        .append("password", user.getPassword())
+                        .append("token", user.getToken())
+                        .append("role", user.getRole()));
 
                 JSONObject dataJson = new JSONObject();
                 dataJson.put("desc",result.getInsertedId().toString());
-                dataJson.put("token",token);
+                dataJson.put("token",user.getToken());
                 dataJson.put("code",200);
                 return dataJson;
             } catch (MongoException me) {
@@ -120,7 +118,6 @@ public class MongoDBDriver {
                 dataJson.put("code",401);
                 return dataJson;
             }
-            String token = JWTDriver.createToken(new JSONObject(doc));
             JSONObject dataJson = new JSONObject();
             dataJson.put("desc","successful");
             dataJson.put("email",doc.getString("email"));
@@ -160,18 +157,40 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
+    public static JSONObject getAllBrands(){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(BRANDS);
+            FindIterable<Document> findIterable = collection.find();
+            Iterator<Document> iterator = findIterable.iterator();
+            ArrayList<Document> brands = new ArrayList<>();
+            while (iterator.hasNext()) {
+                brands.add(iterator.next());
+            }
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("data", brands);
+            dataJson.put("code", 200);
+            return dataJson;
+        } catch (Exception e) {
+            System.out.println(e);
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
+        }
+    }
     public static JSONObject getAllOrders(){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(ORDERS);
             FindIterable<Document> findIterable = collection.find();
             Iterator<Document> iterator = findIterable.iterator();
-            ArrayList<Document> products = new ArrayList<>();
+            ArrayList<Document> orders = new ArrayList<>();
             while (iterator.hasNext()) {
-                products.add(iterator.next());
+                orders.add(iterator.next());
             }
             JSONObject dataJson = new JSONObject();
-            dataJson.put("data", products);
+            dataJson.put("data", orders);
             dataJson.put("code", 200);
             return dataJson;
         } catch (Exception e) {
@@ -228,11 +247,37 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject addColl(String coll){
+    public static JSONObject addBrand(String coll){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            //create new coll
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collection = database.getCollection(coll);
+            MongoCollection<Document> collection = database.getCollection(coll.toLowerCase().replaceAll("\\s","-"));
             collection.createIndex(Indexes.ascending("VIN"), new IndexOptions().unique(true));
+
+            //add to brand coll
+            MongoCollection<Document> brands = database.getCollection(BRANDS);
+            brands.insertOne(new Document()
+                    .append("brand", coll)
+                    .append("models", List.of()));
+            return new JSONObject().put("code", 200);
+        } catch (Exception e) {
+            System.out.println(e);
+            JSONObject dataJson = new JSONObject();
+            dataJson.put("desc",e.toString());
+            dataJson.put("code",500);
+            return dataJson;
+        }
+    }
+    public static JSONObject deleteBrand(String coll){
+        try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            System.out.println(coll);
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(coll.toLowerCase().replaceAll("\\s","-"));
+            collection.drop();
+            //remove from brand coll
+            MongoCollection<Document> brands = database.getCollection(BRANDS);
+            Bson query = eq("brand", coll.replaceAll("\\s","-"));
+            brands.deleteOne(query);
             return new JSONObject().put("code", 200);
         } catch (Exception e) {
             System.out.println(e);

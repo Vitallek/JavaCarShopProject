@@ -118,7 +118,7 @@ const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
               value={itemProps.model}
               onChange={(e) => setItemProps(prev => ({ ...prev, model: e.target.value }))}
             >
-              {brands.find(brand => brand.brand === 'Audi').models.map(model => <MenuItem key={model} value={model}>{model}</MenuItem>)}
+              {brands.find(brand => brand.brand === selectedBrand)?.models.map(model => <MenuItem key={model} value={model}>{model}</MenuItem>)}
             </Select>
             <TextFieldValidatePositiveInt label='Year' field='year' prop={itemProps.year} setItemProps={setItemProps} />
             <TextFieldValidatePositiveInt label='Gen' field='gen' prop={itemProps.gen} setItemProps={setItemProps} />

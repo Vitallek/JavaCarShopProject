@@ -5,8 +5,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
-import org.package1.utility.LoginResponse;
-import org.package1.utility.RegisterResponse;
 import org.package1.utility.User;
 
 import java.io.IOException;
@@ -49,25 +47,44 @@ public class Main {
         port(port);
         enableCORS("http://127.0.0.1:3000", "*", null);
         post("/register", (req, res) -> {
-            JSONObject user = new JSONObject(req.body());
-            System.out.println("register from " + user.getString("email"));
-            String token = JWTDriver.createToken(user);
-            return MongoDBDriver.addUserIfNotExist(user, token);
+//            JSONObject user = new JSONObject(req.body());
+            User user = gson.fromJson(req.body(), User.class);
+            System.out.println("register from " + user.getEmail());
+            JWTDriver.createToken(user);
+            return MongoDBDriver.addUserIfNotExist(user);
         });
         post("/login", (req, res) -> {
-            JSONObject user = new JSONObject(req.body());
-            System.out.println("login from " + user.getString("email"));
-            return MongoDBDriver.manualLogin(user.getString("email"), user.getString("password"));
+//            JSONObject user = new JSONObject(req.body());
+            User user = gson.fromJson(req.body(), User.class);
+            System.out.println("login from " + user.getEmail());
+            return MongoDBDriver.manualLogin(user.getEmail(), user.getPassword());
         });
         post("/token-login", (req, res) -> {
             String token = req.body();
             String payload = JWTDriver.decodeToken(token);
-            JSONObject user = new JSONObject(payload);
-            return MongoDBDriver.tokenLogin(user.getString("email"), user.getString("password"));
+//            JSONObject user = new JSONObject(payload);
+            User user = gson.fromJson(payload, User.class);
+            return MongoDBDriver.tokenLogin(user.getEmail(), user.getPassword());
+        });
+        post("/add-brand", (req,res) -> {
+            JSONObject response =  MongoDBDriver.addBrand(req.body());
+            res.status(response.getInt("code"));
+            return response;
+        });
+        post("/delete-brand", (req,res) -> {
+            JSONObject response =  MongoDBDriver.deleteBrand(req.body());
+            res.status(response.getInt("code"));
+            return response;
         });
         get("/get-all/:coll", (req, res) -> {
             System.out.println("get all " + req.params(":coll").toLowerCase());
             JSONObject response = MongoDBDriver.getAllOfProductType(req.params(":coll").toLowerCase());
+            res.status(response.getInt( "code"));
+            return response;
+        });
+        get("/get-all-brands", (req, res) -> {
+            System.out.println("get all brands");
+            JSONObject response = MongoDBDriver.getAllBrands();
             res.status(response.getInt( "code"));
             return response;
         });
@@ -131,11 +148,6 @@ public class Main {
             res.status(response.getInt("code"));
             return response;
         });
-//        post("add-brand", (req,res) -> {
-//            JSONObject response =  MongoDBDriver.addColl(req.body());
-//            res.status(response.getInt("code"));
-//            return response;
-//        });
         put("update-col/",(req,res) -> {
             JSONObject response = MongoDBDriver.update(req.body());
             res.status(response.getInt("code"));

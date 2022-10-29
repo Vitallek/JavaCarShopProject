@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import 'primeicons/primeicons.css';
@@ -62,18 +61,25 @@ const deleteSelected = (selectedBrand, selectedProducts, setProducts, toast) => 
     })
     .catch(err => console.log(err))
 }
-// const addBrand = (newBrand) => {
-//   if (newBrand.length === 0) return
-//   axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/add-brand`, newBrand)
-//     .then(response => {
-//       Notification.requestPermission().then(_ => {
-//         const notification = new Notification('Бренд добавлен', {
-//           tag: 'addBrand'
-//         })
-//       })
-//     })
-//     .catch(err => console.log(err))
-// }
+const addBrand = (newBrand, toast) => {
+  if (newBrand.length === 0) return
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/add-brand`, newBrand)
+  .then(response => {
+    window.location.reload()
+    toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Бренд добавлен'});
+  })
+    .catch(err => console.log(err))
+}
+const deleteBrand = (selectedBrand, toast) => {
+  if (!window.confirm('Удалить бренд?')) return
+  if (selectedBrand.length === 0) return
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-brand`, selectedBrand)
+  .then(response => {
+    toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Бренд удалён'});
+    window.location.reload()
+  })
+    .catch(err => console.log(err))
+}
 const updateVehicle = (selectedBrand, field, value, rowData, toast) => {
   axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/`, 
   JSON.stringify({
@@ -92,7 +98,7 @@ const CarsComponent = ({ brands }) => {
   const [selectedProducts, setSelectedProducts] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null)
   const generateNumRef = useRef(null)
-  // const newBrandRef = useRef(null)
+  const newBrandRef = useRef(null)
   const isMounted = useRef(false)
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -213,6 +219,27 @@ const CarsComponent = ({ brands }) => {
         >
           {`${selectedBrand} (${products.length})`}
         </Button>
+        <Button
+          disabled={selectedBrand === 'Select Brand'}
+          color='error'
+          onClick={() => deleteBrand(selectedBrand, toast)}
+        >
+          {`delete brand`}
+        </Button>
+        <TextField
+          type="text"
+          style={{width: 100}}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          inputRef={newBrandRef}
+        />
+        <Button
+          color='success'
+          onClick={() => addBrand(newBrandRef.current.value, toast)}
+        >
+          {`add brand`}
+        </Button>
         <Menu
           id="long-menu"
           MenuListProps={{
@@ -243,7 +270,7 @@ const CarsComponent = ({ brands }) => {
           color='error'
           onClick={() => deleteBrandColl(selectedBrand, toast)}
         >
-          {`delete all`}
+          {`delete items`}
         </Button>
         <TextField
           type="number"
@@ -277,21 +304,6 @@ const CarsComponent = ({ brands }) => {
         >
           {`add item`}
         </Button>
-        {/* <TextField
-          type="text"
-          style={{width: 100}}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          inputRef={newBrandRef}
-        />
-        <Button
-          disabled
-          color='primary'
-          onClick={() => addBrand(newBrandRef.current.value)}
-        >
-          {`add brand (off)`}
-        </Button> */}
       </Stack>
       <DataTable
         selection={selectedProducts}
@@ -310,13 +322,13 @@ const CarsComponent = ({ brands }) => {
         <Column field="VIN" header="VIN" filter />
       </DataTable>
 
-        <AddCarDialog 
-          open={openAddDialog}
-          onClose={handleCloseAddDialog}
-          selectedBrand={selectedBrand}
-          brands={brands}
-          refresh={refreshFromDialog}
-        />
+      <AddCarDialog 
+        open={openAddDialog}
+        onClose={handleCloseAddDialog}
+        selectedBrand={selectedBrand}
+        brands={brands}
+        refresh={refreshFromDialog}
+      />
     </>
   )
 }

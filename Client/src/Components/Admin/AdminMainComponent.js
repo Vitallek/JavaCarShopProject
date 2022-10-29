@@ -20,7 +20,7 @@ const AdminMainComponent = () => {
   useEffect(() => {
     let mounted = true
     if (!mounted) return
-    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/brands`)
+    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all-brands`)
       .then(res => setBrands(res.data.data))
       .catch(err => alert('error occured'))
     return () => mounted = false
@@ -36,8 +36,8 @@ const AdminMainComponent = () => {
           textColor="inherit"
           indicatorColor="string"
         >
-          <Tab label="Заказы" />
           <Tab label="Авто" />
+          <Tab label="Заказы" />
           {/* <Tab label="Контент" /> */}
           <Tab label="Пользователи" />
           <Tab color='error' label="Памятка разработчику!" icon={
@@ -45,10 +45,10 @@ const AdminMainComponent = () => {
               <WarningRoundedIcon color='error'/>
             </Tooltip> }/>
         </Tabs>
-        {activeTab === 0 && <AdminOrdersComponent
+        {activeTab === 0 && <CarsComponent
           brands={brands}
         />}
-        {activeTab === 1 && <CarsComponent
+        {activeTab === 1 && <AdminOrdersComponent
           brands={brands}
         />}
         {/* {activeTab === 2 && <WbPricesComponent
@@ -67,7 +67,7 @@ const AdminMainComponent = () => {
           wbStocks={wbStocks}
           setNewWbDiscount={setNewWbDiscount}
         />} */}
-        {activeTab === 4 && <DeployDays/>}
+        {activeTab === 3 && <DeployDays/>}
       </Grid>
     </Grid>
   )

@@ -36,7 +36,7 @@ const CustomRoutes = ({}) => {
   useEffect(() => {
     let mounted = true
     if(!mounted) return
-    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/brands`)
+    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all-brands`)
       .then(res => setBrands(res.data.data))
       .catch(err => {
         setBrands(brandsMock)

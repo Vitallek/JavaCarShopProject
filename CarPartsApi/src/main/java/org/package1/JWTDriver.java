@@ -3,23 +3,24 @@ package org.package1;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.json.JSONObject;
+import org.package1.utility.User;
 
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 
 public class JWTDriver {
-    public static String createToken(JSONObject user){
+    public static void createToken(User user){
         String jwtToken = Jwts.builder()
-                .claim("email", user.getString("email"))
-                .claim("password", user.getString("password"))
-                .claim("role", user.getString("role"))
-                .setSubject(user.getString("email"))
+                .claim("email", user.getEmail())
+                .claim("password", user.getPassword())
+                .claim("role", user.getRole())
+                .setSubject(user.getEmail())
                 .setIssuedAt(Date.from(Instant.now()))
 //                .setExpiration(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))
-                .signWith(SignatureAlgorithm.HS256, user.getString("email") + user.getString("password"))
+                .signWith(SignatureAlgorithm.HS256, user.getEmail() + user.getPassword())
                 .compact();
-        return jwtToken;
+        user.setToken(jwtToken);
     }
     public static String decodeToken(String token){
         String[] chunks = token.split("\\.");
