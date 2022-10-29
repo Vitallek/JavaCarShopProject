@@ -163,13 +163,13 @@ const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
             spacing={2}
           >
             <TextField
-            label="Images Links"
-            placeholder="https://image.com,https://image2.com"
-            multiline
-            variant="standard"
-            value={itemProps.images}
-            onChange={(e) => setItemProps(prev => ({ ...prev, images: e.target.value }))}
-          />
+              label="Images Links"
+              placeholder="https://image.com,https://image2.com"
+              multiline
+              variant="standard"
+              value={itemProps.images}
+              onChange={(e) => setItemProps(prev => ({ ...prev, images: e.target.value }))}
+            />
             </Stack>
           
 

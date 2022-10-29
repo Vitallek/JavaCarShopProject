@@ -247,18 +247,19 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject addBrand(String coll){
+    public static JSONObject addBrand(String data){
         try (MongoClient mongoClient = MongoClients.create(DB_URI)) {
+            JSONObject brand = new JSONObject(data);
             //create new coll
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collection = database.getCollection(coll.toLowerCase().replaceAll("\\s","-"));
+            MongoCollection<Document> collection = database.getCollection(brand.getString("brand").toLowerCase().replaceAll("\\s","-"));
             collection.createIndex(Indexes.ascending("VIN"), new IndexOptions().unique(true));
 
             //add to brand coll
             MongoCollection<Document> brands = database.getCollection(BRANDS);
             brands.insertOne(new Document()
-                    .append("brand", coll)
-                    .append("models", List.of()));
+                    .append("brand", brand.getString("brand"))
+                    .append("models", brand.getJSONArray("models")));
             return new JSONObject().put("code", 200);
         } catch (Exception e) {
             System.out.println(e);

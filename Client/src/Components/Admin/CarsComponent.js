@@ -13,6 +13,7 @@ import { InputText } from 'primereact/inputtext';
 import { generateBrandData } from '../../CreateData/createDataCarModels';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCarDialog from './AddCarDialog';
+import AddBrandDialog from './AddBrandDialog';
 
 const ITEM_HEIGHT = 48
 const isPositiveInteger = (val) => {
@@ -61,15 +62,6 @@ const deleteSelected = (selectedBrand, selectedProducts, setProducts, toast) => 
     })
     .catch(err => console.log(err))
 }
-const addBrand = (newBrand, toast) => {
-  if (newBrand.length === 0) return
-  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/add-brand`, newBrand)
-  .then(response => {
-    window.location.reload()
-    toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Бренд добавлен'});
-  })
-    .catch(err => console.log(err))
-}
 const deleteBrand = (selectedBrand, toast) => {
   if (!window.confirm('Удалить бренд?')) return
   if (selectedBrand.length === 0) return
@@ -98,19 +90,27 @@ const CarsComponent = ({ brands }) => {
   const [selectedProducts, setSelectedProducts] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null)
   const generateNumRef = useRef(null)
-  const newBrandRef = useRef(null)
   const isMounted = useRef(false)
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const toast = useRef(null)
 
-  const [openAddDialog, setOpenAddDialog] = useState(false)
-  const handleClickOpenAddDialog = () => {
-    setOpenAddDialog(true);
+  const [openAddItemDialog, setOpenAddItemDialog] = useState(false)
+  const handleClickOpenAddItemDialog = () => {
+    setOpenAddItemDialog(true);
   };
 
-  const handleCloseAddDialog = () => {
-    setOpenAddDialog(false);
+  const handleCloseAddItemDialog = () => {
+    setOpenAddItemDialog(false);
+  };
+
+  const [openAddBrandDialog, setOpenAddBrandDialog] = useState(false)
+  const handleClickOpenAddBrandDialog = () => {
+    setOpenAddBrandDialog(true);
+  };
+
+  const handleCloseAddBrandDialog = () => {
+    setOpenAddBrandDialog(false);
   };
 
   const handleClickBrandMenu = (event) => {
@@ -226,17 +226,17 @@ const CarsComponent = ({ brands }) => {
         >
           {`delete brand`}
         </Button>
-        <TextField
+        {/* <TextField
           type="text"
           style={{width: 100}}
           InputLabelProps={{
             shrink: true,
           }}
           inputRef={newBrandRef}
-        />
+        /> */}
         <Button
           color='success'
-          onClick={() => addBrand(newBrandRef.current.value, toast)}
+          onClick={() => setOpenAddBrandDialog(true)}
         >
           {`add brand`}
         </Button>
@@ -300,7 +300,7 @@ const CarsComponent = ({ brands }) => {
         <Button
           disabled={selectedBrand === 'Select Brand'}
           color='success'
-          onClick={() => setOpenAddDialog(true)}
+          onClick={() => setOpenAddItemDialog(true)}
         >
           {`add item`}
         </Button>
@@ -323,11 +323,15 @@ const CarsComponent = ({ brands }) => {
       </DataTable>
 
       <AddCarDialog 
-        open={openAddDialog}
-        onClose={handleCloseAddDialog}
+        open={openAddItemDialog}
+        onClose={handleCloseAddItemDialog}
         selectedBrand={selectedBrand}
         brands={brands}
         refresh={refreshFromDialog}
+      />
+      <AddBrandDialog
+        open={openAddBrandDialog}
+        onClose={handleCloseAddBrandDialog}
       />
     </>
   )
