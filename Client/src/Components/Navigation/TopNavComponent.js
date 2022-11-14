@@ -85,7 +85,7 @@ const handleOpenReg = (setDialogOpen,setAnchorEl) => {
   })
   setAnchorEl(null)
 }
-const TopNavComponent = ({ authorized, role }) => {
+const TopNavComponent = ({ authorized, role, name }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const isMenuOpened = Boolean(anchorEl)
   const navigate = useNavigate()
@@ -102,6 +102,11 @@ const TopNavComponent = ({ authorized, role }) => {
           'aria-labelledby': 'basic-button',
         }}
       >
+        {name && <MenuItem onClick={() => {alert('todo')}}>
+          <ListItemText>
+            {`Welcome, ${name}`}
+          </ListItemText>
+        </MenuItem>}
         <MenuItem onClick={() => {alert('todo')}}>
           <ListItemIcon>
             <AccountCircleRoundedIcon />
@@ -123,14 +128,14 @@ const TopNavComponent = ({ authorized, role }) => {
             </ListItemText>
           </MenuItem>: null
         }
-        <MenuItem onClick={() => {alert('todo')}}>
+        {/* <MenuItem onClick={() => {alert('todo')}}>
           <ListItemIcon>
             <FavoriteRoundedIcon />
           </ListItemIcon>
           <ListItemText>
             Избранное
           </ListItemText>
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={() => {
           handleCloseMenu(setAnchorEl)
           navigate('/orders')
@@ -139,7 +144,7 @@ const TopNavComponent = ({ authorized, role }) => {
             <DirectionsCarRoundedIcon />
           </ListItemIcon>
           <ListItemText>
-            Мои заказы
+            Заказы
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={Logout}>

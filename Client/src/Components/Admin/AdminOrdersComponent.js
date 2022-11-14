@@ -29,14 +29,14 @@ const getAllOrders = (setOrders) => {
     })
     .catch(err => console.log(err))
 }
-const deleteSelected = (selectedProducts, setOrders, toast) => {
-  console.log(selectedProducts)
-  // axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-selected/Orders`, { data: JSON.stringify(selectedProducts) })
-  //   .then(response => {
-  //     getAllFromBrand(selectedBrand, setProducts)
-  //     toast.current.show({ severity: 'success', summary: 'Уведомление', detail: 'Данные удалены' });
-  //   })
-  //   .catch(err => console.log(err))
+const deleteSelected = (selectedOrders, setOrders, toast) => {
+  console.log(selectedOrders)
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/cancel-order/`, JSON.stringify(selectedOrders))
+    .then(response => {
+      getAllOrders(setOrders)
+      toast.current.show({ severity: 'success', summary: 'Уведомление', detail: 'Данные удалены' });
+    })
+    .catch(err => console.log(err))
 }
 
 const updateStatus = (newData, toast) => {

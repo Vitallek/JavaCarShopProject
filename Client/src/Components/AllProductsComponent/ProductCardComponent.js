@@ -56,7 +56,13 @@ const MediaCard = ({ element, elIndex }) => {
   const [cardStatus, setCardStatus] = useState(0)
   const toast = useRef(null)
   return (
-    <Card sx={{ maxWidth: 345, m: 2 }}>
+    <Card sx={{ 
+      maxWidth: 345, 
+      m: 2, 
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between'
+    }}>
       <Toast ref={toast} position="bottom-right" />
       <CardMedia
         component="img"

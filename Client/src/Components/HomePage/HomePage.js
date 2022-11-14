@@ -77,7 +77,7 @@ const HomePage = ({ brands }) => {
             sx={{ maxWidth: 200 }}
             onClick={() => navigate('vehicles/Mercedes-Benz')}
           >
-            Перейти
+            explore
           </Button>
         </Stack>
 
@@ -106,7 +106,7 @@ const HomePage = ({ brands }) => {
             if (contentItemIndex > 30) contentItemIndex = 0
             contentItemIndex += 1
           }}
-          autoplayInterval={5000}
+          autoplayInterval={7000}
           itemTemplate={itemTemplate}
         />
       </Grid>

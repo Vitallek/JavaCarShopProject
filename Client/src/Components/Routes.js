@@ -19,7 +19,7 @@ const processBrandsList = (brands) => {
   brands.forEach(brand => {
     menu.push({
       //   icon: <HomeRoundedIcon />,
-      title: `${brand.brand} (${parseInt(Math.random() * 50) + 10})`,
+      title: `${brand.brand} (${parseInt(Math.random() * 140) + 10})`,
       to: `/vehicles/${brand.brand.replace(/ /g,'-')}`,
       items: []
     })
@@ -58,7 +58,7 @@ const CustomRoutes = ({}) => {
         </Grid>
         <Grid container item xs={10} direction='column' flexWrap='nowrap'>
           <Grid item xs={12} sx={{maxHeight: 50}}>
-            <TopNavComponent authorized={props.auth} role={props.role}/>
+            <TopNavComponent authorized={props.auth} role={props.role} name={props.name}/>
           </Grid>
           <Grid container item xs={12} direction='column' flexWrap='nowrap'>
             <Routes>

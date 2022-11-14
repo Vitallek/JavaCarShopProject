@@ -39,7 +39,7 @@ const AdminMainComponent = () => {
           <Tab label="Авто" />
           <Tab label="Заказы" />
           {/* <Tab label="Контент" /> */}
-          <Tab label="Пользователи" />
+          {/* <Tab label="Пользователи" /> */}
           <Tab color='error' label="Памятка разработчику!" icon={
             <Tooltip title="Важно!">
               <WarningRoundedIcon color='error'/>
@@ -67,7 +67,7 @@ const AdminMainComponent = () => {
           wbStocks={wbStocks}
           setNewWbDiscount={setNewWbDiscount}
         />} */}
-        {activeTab === 3 && <DeployDays/>}
+        {activeTab === 2 && <DeployDays/>}
       </Grid>
     </Grid>
   )
