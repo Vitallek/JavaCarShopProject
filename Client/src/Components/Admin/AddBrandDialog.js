@@ -4,16 +4,16 @@ import { Toast } from 'primereact/toast';
 import { Dialog, DialogTitle, Stack, DialogContent, DialogActions, Button, TextField, Select, MenuItem } from "@mui/material";
 import { Divider } from "@mui/material";
 
-const addBrand = (brand, toast) => {
+const addBrand = (brand, toast,token) => {
   if (brand.brand.length === 0) return
-  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/add-brand`, brand)
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/add-brand/${token}`, brand)
   .then(response => {
     window.location.reload()
     toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Бренд добавлен'});
   })
     .catch(err => console.log(err))
 }
-const AddBrandDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
+const AddBrandDialog = ({ open, onClose, selectedBrand, brands, refresh,token }) => {
   const [brand, setBrand] = useState({
     brand: '',
     models: []
@@ -57,7 +57,7 @@ const AddBrandDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
         }}>
           Отмена
         </Button>
-        <Button onClick={() => addBrand(brand, toast)}>
+        <Button onClick={() => addBrand(brand, toast, token)}>
           Добавить
         </Button>
       </DialogActions>

@@ -16,7 +16,7 @@ const getPhotos = async (query) => {
     .catch(err => console.log(err))
 }
 const getModels = async () => {
-  return axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all/brands`)
+  return axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all-brands`)
     .then(response => response.data.data)
     .catch(err => console.log(err))
 }
@@ -71,7 +71,7 @@ export const generateBrandData = async (selectedBrand, amount) => {
   const carsModelsPhotosLinks = await getPhotos(selectedBrand)
   const resultPerBrand = []
   const brand = carsModels.find(el => el.brand === selectedBrand)
-  if(typeof brand === 'undefined') return []
+  if(brand  === undefined) return []
   const brandIndex = carsModels.indexOf(brand)
   
   for (let i = 0; i < amount; i++) {

@@ -10,7 +10,7 @@ const processOrder = (element,userInfoContext) => {
   element.user_email = userInfoContext.email
   element.user_phone = userInfoContext.phone
   delete element._id
-  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/order-vehicle/`, element)
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/order-vehicle/${userInfoContext.token}`, element)
     .then(response => {
       console.log(response)
     })
@@ -105,21 +105,21 @@ const MediaCard = ({ element, elIndex }) => {
               }, 5000)
             }}
           >
-            Купить
+            Заказать
           </Button>}
         {cardStatus === 1 &&
           <LoadingButton
             loading
             size="small"
           >
-            Купить
+            Заказать
           </LoadingButton >}
         {cardStatus === 2 &&
           <Button
             disabled
             size="small"
           >
-            Купить
+            Заказать
           </Button >}
       </CardActions>
     </Card>

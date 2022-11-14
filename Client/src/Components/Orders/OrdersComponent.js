@@ -7,11 +7,11 @@ import { Toast } from 'primereact/toast';
 import { Button as PrimeButton } from 'primereact/button'
 
 let cancelTimeout
-const cancelOrder = (element, email,setCardStatus) => {
+const cancelOrder = (element, email,setCardStatus,token) => {
   delete element._id
   delete element.user_email
   delete element.user_phone
-  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/cancel-order/`, JSON.stringify([element]))
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/cancel-order/${token}`, JSON.stringify([element]))
     .then(response => {
       console.log(response)
       setCardStatus(0)
@@ -28,7 +28,7 @@ const OrdersComponent = ({ brands, user }) => {
     if (!mounted) return
     console.log(user.email)
     if (user.email === undefined) return
-    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-orders/${user.email}`)
+    axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-orders/${user.email}/${userInfoContext.token}`)
       .then(response => {
         console.log(response.data)
         if (response.data.data.length === 0) return
@@ -138,7 +138,7 @@ const MediaCard = ({ element, elIndex }) => {
               setCardStatus(-1)
 
               cancelTimeout = setTimeout(() => {
-                cancelOrder(element, userInfoContext.email, setCardStatus)
+                cancelOrder(element, userInfoContext.email, setCardStatus,userInfoContext.token)
                 toast.current.show({severity:'success', summary: 'Вы отменили заказ', life: 3000})
               }, 5000)
             }}

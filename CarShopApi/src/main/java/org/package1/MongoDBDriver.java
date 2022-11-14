@@ -188,8 +188,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject getAllOrders(MongoClient mongoClient){
+    public static JSONObject getAllOrders(MongoClient mongoClient, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(ORDERS);
             FindIterable<Document> findIterable = collection.find();
@@ -210,8 +216,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject deleteAllFromColl(MongoClient mongoClient,String coll){
+    public static JSONObject deleteAllFromColl(MongoClient mongoClient,String coll, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             collection.deleteMany(new BsonDocument());
@@ -224,8 +236,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject deleteSelectedFromColl(MongoClient mongoClient,String coll, String selected){
+    public static JSONObject deleteSelectedFromColl(MongoClient mongoClient,String coll, String selected, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             ArrayList<Document> selectedDocs =  gson.fromJson(selected, new TypeToken<List<Document>>() {}.getType());
@@ -242,8 +260,15 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject insertMany(MongoClient mongoClient,String coll, String data){
+    public static JSONObject insertMany(MongoClient mongoClient,String coll, String data, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
+            System.out.println(data.length() + "rows to insert");
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll);
             collection.insertMany(gson.fromJson(data, new TypeToken<List<Document>>() {}.getType()));
@@ -256,8 +281,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject addBrand(MongoClient mongoClient,String data){
+    public static JSONObject addBrand(MongoClient mongoClient,String data, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             JSONObject brand = new JSONObject(data);
             //create new coll
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
@@ -278,8 +309,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject deleteBrand(MongoClient mongoClient,String coll){
+    public static JSONObject deleteBrand(MongoClient mongoClient,String coll, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             System.out.println(coll);
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(coll.toLowerCase().replaceAll("\\s","-"));
@@ -297,8 +334,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject update(MongoClient mongoClient,String data){
+    public static JSONObject update(MongoClient mongoClient,String data, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             JSONObject dataJson = new JSONObject(data);
             String coll = dataJson.getString("coll");
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
@@ -325,8 +368,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject orderVehicle(MongoClient mongoClient,String data){
+    public static JSONObject orderVehicle(MongoClient mongoClient,String data, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             JSONObject dataJson = new JSONObject(data);
             MongoCollection<Document> vehicleCollection = database.getCollection(
@@ -349,8 +398,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject cancelOrder(MongoClient mongoClient,String data){
+    public static JSONObject cancelOrder(MongoClient mongoClient,String data, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             JSONArray dataArray = new JSONArray(data);
             for (int i = 0 ; i < dataArray.length(); i++) {
@@ -377,8 +432,14 @@ public class MongoDBDriver {
             return dataJson;
         }
     }
-    public static JSONObject getUserOrders(MongoClient mongoClient,String email){
+    public static JSONObject getUserOrders(MongoClient mongoClient,String email, String token){
         try {
+            if(!isAuth(mongoClient, token)) {
+                JSONObject dataJson = new JSONObject();
+                dataJson.put("desc","unauth action");
+                dataJson.put("code",500);
+                return dataJson;
+            }
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collection = database.getCollection(ORDERS);
             FindIterable<Document> findIterable = collection.find(eq("user_email", email));

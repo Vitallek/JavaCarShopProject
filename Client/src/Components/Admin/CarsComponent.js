@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import axios from 'axios'
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
@@ -14,6 +14,7 @@ import { generateBrandData } from '../../CreateData/createDataCarModels';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCarDialog from './AddCarDialog';
 import AddBrandDialog from './AddBrandDialog';
+import { UserInfoContext } from '../../UserInfoContext';
 
 const ITEM_HEIGHT = 48
 const isPositiveInteger = (val) => {
@@ -33,47 +34,48 @@ const getAllFromBrand = (selectedBrand, setProducts) => {
     })
     .catch(err => console.log(err))
 }
-const deleteBrandColl = (selectedBrand, toast) => {
-  axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-all/${selectedBrand.toLowerCase().replace(/ /g, '-')}`)
+const deleteBrandColl = (selectedBrand, toast,token) => {
+  axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-all/${selectedBrand.toLowerCase().replace(/ /g, '-')}/${token}`)
     .then(response => {
       toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные удалены'});
     })
     .catch(err => console.log(err))
 }
-const generateRandomData = async (selectedBrand, amount, setProducts, toast) => {
+const generateRandomData = async (selectedBrand, amount, setProducts, toast,token) => {
   if (amount === '') {
     alert('empty input')
     return
   }
   let data = await generateBrandData(selectedBrand, parseInt(amount))
-  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, JSON.stringify(data))
+  console.log(data)
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}/${token}`, JSON.stringify(data))
     .then(response => {
       getAllFromBrand(selectedBrand, setProducts)
       toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные добавлены'});
     })
     .catch(err => console.log(err))
 }
-const deleteSelected = (selectedBrand, selectedProducts, setProducts, toast) => {
+const deleteSelected = (selectedBrand, selectedProducts, setProducts, toast,token) => {
   console.log(selectedProducts)
-  axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-selected/${selectedBrand.toLowerCase().replace(/ /g, '-')}`, { data: JSON.stringify(selectedProducts) })
+  axios.delete(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-selected/${selectedBrand.toLowerCase().replace(/ /g, '-')}/${token}`, { data: JSON.stringify(selectedProducts) })
     .then(response => {
       getAllFromBrand(selectedBrand, setProducts)
       toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные удалены'});
     })
     .catch(err => console.log(err))
 }
-const deleteBrand = (selectedBrand, toast) => {
+const deleteBrand = (selectedBrand, toast,token) => {
   if (!window.confirm('Удалить бренд?')) return
   if (selectedBrand.length === 0) return
-  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-brand`, selectedBrand)
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/delete-brand/${token}`, selectedBrand)
   .then(response => {
     toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Бренд удалён'});
     window.location.reload()
   })
     .catch(err => console.log(err))
 }
-const updateVehicle = (selectedBrand, field, value, rowData, toast) => {
-  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/`, 
+const updateVehicle = (selectedBrand, field, value, rowData, toast,token) => {
+  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/${token}`, 
   JSON.stringify({
     coll: selectedBrand.toLowerCase().replace(/ /g, '-'), 
     field: field,
@@ -85,6 +87,7 @@ const updateVehicle = (selectedBrand, field, value, rowData, toast) => {
     .catch(err => console.log(err))
 }
 const CarsComponent = ({ brands }) => {
+  const userInfoContext = useContext(UserInfoContext)
   const [products, setProducts] = useState([])
   const [selectedBrand, setSelectedBrand] = useState('Select Brand')
   const [selectedProducts, setSelectedProducts] = useState(null);
@@ -144,7 +147,7 @@ const CarsComponent = ({ brands }) => {
       case 'year':
         if (isPositiveInteger(newValue)){
           rowData[field] = newValue;
-          updateVehicle(selectedBrand, field, parseInt(newValue), rowData, toast)
+          updateVehicle(selectedBrand, field, parseInt(newValue), rowData, toast,userInfoContext.token)
         }
         else
           event.preventDefault();
@@ -155,7 +158,7 @@ const CarsComponent = ({ brands }) => {
       default:
         if (newValue.trim().length > 0) {
           rowData[field] = newValue;
-          updateVehicle(selectedBrand, field, newValue, rowData, toast)
+          updateVehicle(selectedBrand, field, newValue, rowData, toast,userInfoContext.token)
         }
         else
           event.preventDefault();
@@ -222,7 +225,7 @@ const CarsComponent = ({ brands }) => {
         <Button
           disabled={selectedBrand === 'Select Brand'}
           color='error'
-          onClick={() => deleteBrand(selectedBrand, toast)}
+          onClick={() => deleteBrand(selectedBrand, toast,userInfoContext.token)}
         >
           {`delete brand`}
         </Button>
@@ -268,7 +271,7 @@ const CarsComponent = ({ brands }) => {
         <Button
           disabled={selectedBrand === 'Select Brand'}
           color='error'
-          onClick={() => deleteBrandColl(selectedBrand, toast)}
+          onClick={() => deleteBrandColl(selectedBrand, toast,userInfoContext.token)}
         >
           {`delete items`}
         </Button>
@@ -283,7 +286,7 @@ const CarsComponent = ({ brands }) => {
         <Button
           disabled={selectedBrand === 'Select Brand'}
           color='error'
-          onClick={() => generateRandomData(selectedBrand, generateNumRef.current.value, setProducts, toast)}
+          onClick={() => generateRandomData(selectedBrand, generateNumRef.current.value, setProducts, toast,userInfoContext.token)}
         >
           {`<- generate random`}
         </Button>
@@ -291,7 +294,7 @@ const CarsComponent = ({ brands }) => {
           disabled={selectedBrand === 'Select Brand'}
           color='error'
           onClick={() => {
-            deleteSelected(selectedBrand, selectedProducts, setProducts, toast)
+            deleteSelected(selectedBrand, selectedProducts, setProducts, toast,userInfoContext.token)
             setSelectedProducts([])
           }}
         >
@@ -328,10 +331,12 @@ const CarsComponent = ({ brands }) => {
         selectedBrand={selectedBrand}
         brands={brands}
         refresh={refreshFromDialog}
+        token={userInfoContext.token}
       />
       <AddBrandDialog
         open={openAddBrandDialog}
         onClose={handleCloseAddBrandDialog}
+        token={userInfoContext.token}
       />
     </>
   )

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import axios from 'axios'
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
@@ -10,7 +10,7 @@ import { Column } from 'primereact/column'
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { Button, Stack } from '@mui/material';
-
+import {UserInfoContext} from '../../UserInfoContext'
 const ITEM_HEIGHT = 48
 const isPositiveInteger = (val) => {
   let str = String(val);
@@ -22,26 +22,26 @@ const isPositiveInteger = (val) => {
   let n = Math.floor(Number(str));
   return n !== Infinity && String(n) === str && n >= 0;
 }
-const getAllOrders = (setOrders) => {
-  axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all-orders`)
+const getAllOrders = (setOrders,token) => {
+  axios.get(`http://${process.env.REACT_APP_SERVER_ADDR}/get-all-orders/${token}`)
     .then(response => {
       setOrders(response.data.data)
     })
     .catch(err => console.log(err))
 }
-const deleteSelected = (selectedOrders, setOrders, toast) => {
+const deleteSelected = (selectedOrders, setOrders, toast, token) => {
   console.log(selectedOrders)
-  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/cancel-order/`, JSON.stringify(selectedOrders))
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/cancel-order/${token}`, JSON.stringify(selectedOrders))
     .then(response => {
-      getAllOrders(setOrders)
+      getAllOrders(setOrders,token)
       toast.current.show({ severity: 'success', summary: 'Уведомление', detail: 'Данные удалены' });
     })
     .catch(err => console.log(err))
 }
 
-const updateStatus = (newData, toast) => {
+const updateStatus = (newData, toast, token) => {
   console.log(newData)
-  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/`,
+  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/update-col/${token}`,
     JSON.stringify({coll:'Orders', field: 'status', value: newData.status, 'VIN': newData["VIN"] })
   ).then(response => {
     toast.current.show({ severity: 'success', summary: 'Уведомление', detail: 'Данные обновлены' });
@@ -52,6 +52,7 @@ const updateStatus = (newData, toast) => {
     })
 }
 const AdminOrdersComponent = ({ brands }) => {
+  const userInfoContext = useContext(UserInfoContext)
   const [orders, setOrders] = useState([])
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [editingRows, setEditingRows] = useState({})
@@ -61,7 +62,7 @@ const AdminOrdersComponent = ({ brands }) => {
 
   useEffect(() => {
     isMounted.current = true
-    getAllOrders(setOrders)
+    getAllOrders(setOrders,userInfoContext.token)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onCellEditComplete = (e, selectedBrand) => {
@@ -107,7 +108,7 @@ const AdminOrdersComponent = ({ brands }) => {
   const onRowEditComplete = (e) => {
     let _orders = [...orders];
     let { newData, index } = e;
-    updateStatus(e.newData, toast)
+    updateStatus(e.newData, toast, userInfoContext.token)
     _orders[index] = newData;
     setOrders(_orders);
   }
@@ -119,7 +120,7 @@ const AdminOrdersComponent = ({ brands }) => {
           disabled={selectedOrders.length === 0}
           color='error'
           onClick={() => {
-            deleteSelected(selectedOrders, setOrders, toast)
+            deleteSelected(selectedOrders, setOrders, toast, userInfoContext.token)
             setSelectedOrders([])
           }}
         >

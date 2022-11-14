@@ -36,10 +36,10 @@ const cleanObject = (selectedBrand) => ({
   seating: '',
   status: 0
 })
-const addItem = (selectedBrand, itemProps, refresh, toast) => {
+const addItem = (selectedBrand, itemProps, refresh, toast,token) => {
   const objectToPush = { ...itemProps }
   objectToPush.images = itemProps.images.split(',')
-  axios.put(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}`,
+  axios.post(`http://${process.env.REACT_APP_SERVER_ADDR}/insert-to-coll/${selectedBrand.toLowerCase().replace(/ /g, '-')}/${token}`,
     JSON.stringify([objectToPush])
   ).then(response => {
     toast.current.show({severity: 'success', summary: 'Уведомление', detail: 'Данные добавлены', position:'bottom-right'});
@@ -76,7 +76,7 @@ const TextFieldNoValidate = ({ label, field, prop, setItemProps }) => {
       onChange={(e) => setItemProps(prev => ({ ...prev, [field]: e.target.value }))}
     />)
 }
-const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
+const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh,token }) => {
   const [itemProps, setItemProps] = useState(cleanObject(selectedBrand))
   const toast = useRef(null)
   useEffect(() => {
@@ -185,7 +185,7 @@ const AddCarDialog = ({ open, onClose, selectedBrand, brands, refresh }) => {
         }}>
           Отмена
         </Button>
-        <Button onClick={() => addItem(selectedBrand, itemProps, refresh, toast)}>
+        <Button onClick={() => addItem(selectedBrand, itemProps, refresh, toast,token)}>
           Добавить
         </Button>
       </DialogActions>
